@@ -22,9 +22,11 @@ const CANVAS_WIDTH = 480;
 var x = new Array(MAX_LENGTH);
 var y = new Array(MAX_LENGTH);   
 
+//connect to the server
+let socket = new WebSocket("ws://localhost:8000/ws"); 
 
 function init() {
-    canvas = document.getElementById('myCanvas');
+    canvas = document.getElementById('Canvas');
     ctx = canvas.getContext('2d');
     loadImages();
     createSnake();
@@ -81,6 +83,11 @@ function gameOver() {
     ctx.textAlign = 'center'; 
     ctx.font = 'normal bold 18px serif'; 
     ctx.fillText('Game over', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+    btn=document.getElementById("btn");
+    btn.textContent="Play Again";
+    btn.onclick=function(){
+        location.reload();
+    }
 }
 
 function move() {
@@ -128,16 +135,16 @@ function CreateApple() {
 }    
 
 //game loop
-function gameCycle() {   
+function gameCycle() {  
     if (inGame) {
         checkApple();
         checkCollision();
         move();
         doDrawing();
-        //get the position of the snake
-        var snake_pos = x[0] + "," + y[0];
-        //TODO send the position to the server
-      
+        var snake_pos = [x[0],y[0]];
+        var apple_pos = [apple_x,apple_y];
+        send_sever(socket, snake_pos, snake_size, apple_pos);
+        //TODO get data from server
         setTimeout("gameCycle()", DELAY);
     }
 }
@@ -165,4 +172,20 @@ onkeydown = function(e) {
         rightDirection = false;
         leftDirection = false;
     }        
+};
+
+//send data to server
+function send_sever(socket, snake_pos, snake_size, apple_pos) {
+    data = {
+        "snake_pos": snake_pos,
+        "snake_size": snake_size,
+        "apple_pos": apple_pos
+    };
+    socket.send(JSON.stringify(data));
+}
+
+socket.onmessage = function(event) {
+  //alert(`[message] Data received from server: ${event.data}`);
+  //TODO something with the data from server
+  console.log(event.data);
 };
