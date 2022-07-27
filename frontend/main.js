@@ -227,19 +227,24 @@ onkeydown = function(e) {
 
 //send data to server
 function send_sever(socket, snake_pos, snake_size, food_pos) {
-    data = {
-        "snake_pos": snake_pos,
-        "snake_size": snake_size,
-        "food_pos": food_pos
-    };
-    socket.send(JSON.stringify(data));
+    if (socket.readyState === socket.OPEN) {
+        data = {
+            "snake_pos": snake_pos,
+            "snake_size": snake_size,
+            "food_pos": food_pos
+        };
+        socket.send(JSON.stringify(data));
+    }
 }
 
-//for debugging
+//receive data from server
 socket.onmessage = function(event) {
-    //alert(`[message] Data received from server: ${event.data}`);
     var data = JSON.parse(event.data);
-    console.log(event.data);
+    //console.log(data);
+    if (data.type === "food") {
+        foods = data["food"];
+        console.log("got food list from server " + foods);
+    }
 };
 
 socket.onclose = function(event) {
