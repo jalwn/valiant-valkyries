@@ -18,7 +18,7 @@ const MAX_LENGTH = 100;//max length of the snake
 const DELAY = 120;
 const CANVAS_HEIGHT = 480;
 const CANVAS_WIDTH = 480;
-const MAX_FOOD = 1;
+const FOOD_SPEED = BLOCK_SIZE/2;
 
 var x = new Array(MAX_LENGTH);
 var y = new Array(MAX_LENGTH);
@@ -33,6 +33,7 @@ function init() {
     loadImages();
     createSnake();
     //Todo: get the food from the server
+    Createfood();
     Createfood();
     Createfood();
     Createfood();
@@ -66,13 +67,19 @@ function doDrawing() {
         for (var i = 0; i < foods.length; i++) {
             food=foods[i];
             ctx.drawImage(food_img, food[0], food[1]);
+            ctx.strokeStyle = 'green';
+            ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
         }
         //draw the snake
-        for (var z = 0; z < snake_size; z++) {
+        for (var z = snake_size-1; z >= 0; z--) {
             if (z == 0) {
                 ctx.drawImage(head, x[z], y[z]);
+                ctx.strokeStyle = 'red';
+                ctx.strokeRect( x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
             } else {
                 ctx.drawImage(body, x[z], y[z]);
+                ctx.strokeStyle = 'blue';
+                ctx.strokeRect( x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
             }
         }
     } else {
@@ -106,13 +113,13 @@ function move() {
     for (var i = 0; i < foods.length; i++) {
         food=foods[i]
         if (food[2] == 0) {
-            foods[i][0] -= BLOCK_SIZE;
+            foods[i][0] -= FOOD_SPEED;
         } else if (food[2] == 1) {
-            foods[i][0] += BLOCK_SIZE;
+            foods[i][0] += FOOD_SPEED;
         } else if (food[2] == 2) {
-            foods[i][1] -= BLOCK_SIZE;
+            foods[i][1] -= FOOD_SPEED;
         } else if (food[2] == 3) {
-            foods[i][1] += BLOCK_SIZE;
+            foods[i][1] += FOOD_SPEED;
         }
     }
     if (leftDirection) {
@@ -163,13 +170,20 @@ function checkFoodCollision() {
 
 //check if the snake hits the food
 function checkfood() {
+    snake = [x[0], y[0]];
     for (var i = 0; i < foods.length; i++) {
-        if ((x[0] == foods[i][0]) && (y[0] == foods[i][1])) {
+        food = [foods[i][0], foods[i][1]];
+        if (intersect(snake, food)) {
             snake_size++;
             foods.splice(i, 1);
             Createfood();
         }
     }
+}
+
+//fuction to check if a rectangle intersects another rectangle
+function intersect(a,b) {
+    return !(a[0] > b[0] + BLOCK_SIZE || a[0] + BLOCK_SIZE < b[0] || a[1] > b[1] + BLOCK_SIZE || a[1] + BLOCK_SIZE < b[1]);
 }
 
 //random food generation
