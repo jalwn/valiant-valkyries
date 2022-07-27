@@ -2,11 +2,13 @@
 var canvas;
 var ctx;
 var head;
-var apple;
+var food_img;
 var body;
 var snake_size;
-var apple_x;
-var apple_y;
+var food;
+var foods = [];
+var food_x;
+var food_y;
 var leftDirection = false;
 var rightDirection = true;
 var upDirection = false;
@@ -15,22 +17,24 @@ var inGame = true;
 
 const BLOCK_SIZE = 10;//change the block size will also need a change in the images
 const MAX_LENGTH = 100;//max length of the snake
-const DELAY = 140;
+const DELAY = 120;
 const CANVAS_HEIGHT = 480;
 const CANVAS_WIDTH = 480;
+const MAX_FOOD = 1;
 
 var x = new Array(MAX_LENGTH);
 var y = new Array(MAX_LENGTH);
 
 //connect to the server
 let socket = new WebSocket("ws://localhost:8000/ws");
+//todo: catch connection error
 
 function init() {
     canvas = document.getElementById('Canvas');
     ctx = canvas.getContext('2d');
     loadImages();
     createSnake();
-    CreateApple();
+    Createfood();
     setTimeout("gameCycle()", DELAY);
 }
 
@@ -39,8 +43,8 @@ function loadImages() {
     head.src = 'images/head.png';
     body = new Image();
     body.src = 'images/body.png';
-    apple = new Image();
-    apple.src = 'images/apple.png';
+    food_img = new Image();
+    food_img.src = 'images/apple.png';
 }
 
 //initialize the snake
@@ -52,19 +56,17 @@ function createSnake() {
     }
 }
 
-//check collision with the apple
-function checkApple() {
-    if ((x[0] == apple_x) && (y[0] == apple_y)) {
-        snake_size++;
-        CreateApple();
-    }
-}
-
 //draw the game
 function doDrawing() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     if (inGame) {
-        ctx.drawImage(apple, apple_x, apple_y);
+
+        //draw the foods
+        for (var i = 0; i < foods.length; i++) {
+            food=foods[i];
+            ctx.drawImage(food_img, food[0], food[1]);
+        }
+        //draw the snake
         for (var z = 0; z < snake_size; z++) {
             if (z == 0) {
                 ctx.drawImage(head, x[z], y[z]);
@@ -85,15 +87,32 @@ function gameOver() {
     ctx.fillText('Game over', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
     btn=document.getElementById("btn");
     btn.textContent="Play Again";
+    btn.style.display="block";
     btn.onclick=function(){
         location.reload();
     }
+    socket.send(JSON.stringify({ "game_over": true }));
+    socket.close();
 }
 
 function move() {
+    //move the snake
     for (var z = snake_size; z > 0; z--) {
         x[z] = x[(z - 1)];
         y[z] = y[(z - 1)];
+    }
+    //move the foods
+    for (var i = 0; i < foods.length; i++) {
+        food=foods[i]
+        if (food[2] == 0) {
+            foods[i][0] -= 1;
+        } else if (food[2] == 1) {
+            foods[i][0] += 1;
+        } else if (food[2] == 2) {
+            foods[i][1] -= 1;
+        } else if (food[2] == 3) {
+            foods[i][1] += 1;
+        }
     }
     if (leftDirection) {
         x[0] -= BLOCK_SIZE;
@@ -125,25 +144,41 @@ function checkCollision() {
     }
 }
 
-//random apple generation
+//check collision with the food
+function checkfood() {
+    for (var i = 0; i < foods.length; i++) {
+        if ((x[0] == foods[i][0]) && (y[0] == foods[i][1])) {
+            snake_size++;
+            delete foods[i];
+            Createfood();
+        }
+    }
+}
+
+//random food generation
 //TODO replace with a location from server
-function CreateApple() {
-    var r = Math.floor(Math.random() * 29);
-    apple_x = r * BLOCK_SIZE;
-    r = Math.floor(Math.random() * 29);
-    apple_y = r * BLOCK_SIZE;
+function Createfood() {
+    var r = Math.floor(Math.random() * 40);
+    food_x = r * BLOCK_SIZE;
+    r = Math.floor(Math.random() * 40);
+    food_y = r * BLOCK_SIZE;
+    food_direction = Math.floor(Math.random() * 3);//0:left, 1:right, 2:up, 3:down
+    foods.push([food_x, food_y, food_direction]);
 }
 
 //game loop
 function gameCycle() {
+    //console.timeEnd("gameCycle");
     if (inGame) {
-        checkApple();
+        //console.time("gameCycle");
+        checkfood();
         checkCollision();
         move();
         doDrawing();
         var snake_pos = [x[0],y[0]];
-        var apple_pos = [apple_x,apple_y];
-        send_sever(socket, snake_pos, snake_size, apple_pos);
+        var food_pos = [foods[0][0],foods[0][1]];
+        send_sever(socket, snake_pos, snake_size, food_pos);
+        console.log(foods);
         //TODO get data from server
         setTimeout("gameCycle()", DELAY);
     }
@@ -175,17 +210,32 @@ onkeydown = function(e) {
 };
 
 //send data to server
-function send_sever(socket, snake_pos, snake_size, apple_pos) {
+function send_sever(socket, snake_pos, snake_size, food_pos) {
     data = {
         "snake_pos": snake_pos,
         "snake_size": snake_size,
-        "apple_pos": apple_pos
+        "food_pos": food_pos
     };
     socket.send(JSON.stringify(data));
 }
 
+//for debugging
 socket.onmessage = function(event) {
     //alert(`[message] Data received from server: ${event.data}`);
     var data = JSON.parse(event.data);
     console.log(event.data);
+};
+
+socket.onclose = function(event) {
+    if (event.wasClean) {
+        console.log(`[close] Connection closed cleanly, code=${event.code}`);
+    } else {
+        // e.g. server process killed or network down
+        // event.code is usually 1006 in this case
+        alert('[close] Connection died');
+    }
+};
+//for debugging
+socket.onerror = function(error) {
+    alert(`[error] ${error.message}`);
 };
