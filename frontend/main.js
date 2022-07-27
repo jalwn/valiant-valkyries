@@ -7,8 +7,6 @@ var body;
 var snake_size;
 var food;
 var foods = [];
-var food_x;
-var food_y;
 var leftDirection = false;
 var rightDirection = true;
 var upDirection = false;
@@ -34,6 +32,9 @@ function init() {
     ctx = canvas.getContext('2d');
     loadImages();
     createSnake();
+    //Todo: get the food from the server
+    Createfood();
+    Createfood();
     Createfood();
     setTimeout("gameCycle()", DELAY);
 }
@@ -105,13 +106,13 @@ function move() {
     for (var i = 0; i < foods.length; i++) {
         food=foods[i]
         if (food[2] == 0) {
-            foods[i][0] -= 1;
+            foods[i][0] -= BLOCK_SIZE;
         } else if (food[2] == 1) {
-            foods[i][0] += 1;
+            foods[i][0] += BLOCK_SIZE;
         } else if (food[2] == 2) {
-            foods[i][1] -= 1;
+            foods[i][1] -= BLOCK_SIZE;
         } else if (food[2] == 3) {
-            foods[i][1] += 1;
+            foods[i][1] += BLOCK_SIZE;
         }
     }
     if (leftDirection) {
@@ -129,7 +130,7 @@ function move() {
 }
 
 //check if the snake hits the wall
-function checkCollision() {
+function checkSnakeCollision() {
     if (y[0] >= CANVAS_HEIGHT) {
         inGame = false;
     }
@@ -144,12 +145,28 @@ function checkCollision() {
     }
 }
 
-//check collision with the food
+//check if the food hit the wall
+function checkFoodCollision() {
+    for (var i = 0; i < foods.length; i++) {
+        food=foods[i];
+        if (food[0] >= CANVAS_WIDTH) {
+            foods[i][2] = 0;
+        } else if (food[0] < 0) {
+            foods[i][2] = 1;
+        } else if (food[1] >= CANVAS_HEIGHT) {
+            foods[i][2] = 2;
+        } else if (food[1] < 0) {
+            foods[i][2] = 3;
+        }
+    }
+}
+
+//check if the snake hits the food
 function checkfood() {
     for (var i = 0; i < foods.length; i++) {
         if ((x[0] == foods[i][0]) && (y[0] == foods[i][1])) {
             snake_size++;
-            delete foods[i];
+            foods.splice(i, 1);
             Createfood();
         }
     }
@@ -171,14 +188,13 @@ function gameCycle() {
     //console.timeEnd("gameCycle");
     if (inGame) {
         //console.time("gameCycle");
-        checkfood();
-        checkCollision();
+        checkSnakeCollision();
+        checkFoodCollision();
         move();
         doDrawing();
+        checkfood();
         var snake_pos = [x[0],y[0]];
-        var food_pos = [foods[0][0],foods[0][1]];
-        send_sever(socket, snake_pos, snake_size, food_pos);
-        console.log(foods);
+        send_sever(socket, snake_pos, snake_size, foods);
         //TODO get data from server
         setTimeout("gameCycle()", DELAY);
     }
