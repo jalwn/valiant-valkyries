@@ -151,23 +151,23 @@ function gameCycle() {
 
 //check if the key is pressed
 onkeydown = function(e) {
-    var key = e.keyCode;
-    if ((key == 37) && (!rightDirection)) {//move left
+    var key = e.key;
+    if ((key == "ArrowLeft") && (!rightDirection)) {//move left
         leftDirection = true;
         upDirection = false;
         downDirection = false;
     }
-    if ((key == 39) && (!leftDirection)) {//move right
+    if ((key == "ArrowRight") && (!leftDirection)) {//move right
         rightDirection = true;
         upDirection = false;
         downDirection = false;
     }
-    if ((key == 38) && (!downDirection)) {//move up
+    if ((key == "ArrowUp") && (!downDirection)) {//move up
         upDirection = true;
         rightDirection = false;
         leftDirection = false;
     }
-    if ((key == 40) && (!upDirection)) {//move down
+    if ((key == "ArrowDown") && (!upDirection)) {//move down
         downDirection = true;
         rightDirection = false;
         leftDirection = false;
