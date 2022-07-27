@@ -2,9 +2,9 @@
 .PHONY: server, frontend
 
 server:
-	cd backend 
+	cd backend
 	uvicorn main:app --reload
 
 frontend:
-	cd frontend 
+	cd frontend
 	python -m http.server 9000
