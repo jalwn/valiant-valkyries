@@ -8,6 +8,8 @@ venv
 .env
 env
 
+*.bat
+
 # Unittest reports
 .coverage*
 
