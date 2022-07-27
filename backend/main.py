@@ -4,7 +4,7 @@ app = FastAPI()
 
 
 @app.websocket_route("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(websocket: WebSocket) -> None:
     """Websocket server endpoint
 
     This function is called when a websocket connection is made.
