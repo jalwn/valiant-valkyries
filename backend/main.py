@@ -31,10 +31,12 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             # print(receive_data)
             if "info" in receive_data:
                 # todo: save info to the local variable
-                print(receive_data["info"])
+                continue
+                # print(receive_data["info"])
             if "food_eaten" in receive_data:
-                # Todo send a single food item to client and remove it from the list
-                print(receive_data["food_eaten"])
+                del foods_list[receive_data["food_eaten"]]
+                foods_list.append(food := create_food())
+                await send_single_food(websocket, food)
             if "save" in receive_data:
                 # Todo save the score and update the leaderboard
                 print(receive_data["save"])
@@ -51,7 +53,12 @@ async def send_food_client(socket: WebSocket, food_list: List[List[int]]) -> Non
     await socket.send_json({"food_list": food_list})
 
 
-def create_food() -> List[List[int]]:
+async def send_single_food(socket: WebSocket, food: List[int]) -> None:
+    """Send single created food data to client."""
+    await socket.send_json({"food": food})
+
+
+def create_food() -> List[int]:
     """
     Create one food item for snake to consume.
 
@@ -76,7 +83,7 @@ def food_list() -> List[List[int]]:
     for _ in range(3):
         food = create_food()
         food_list.append(food)
-    print(food_list)
+    # print(food_list)
     return food_list
 
 
