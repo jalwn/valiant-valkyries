@@ -18,14 +18,14 @@ const MAX_LENGTH = 100;//max length of the snake
 const DELAY = 120;
 const CANVAS_HEIGHT = 480;
 const CANVAS_WIDTH = 480;
-const FOOD_SPEED = BLOCK_SIZE/2;
+const SNAKE_SPEED = 8;
+const FOOD_SPEED = 4;
 
 var x = new Array(MAX_LENGTH);
 var y = new Array(MAX_LENGTH);
 
 //connect to the server
 let socket = new WebSocket("ws://localhost:8000/ws");
-//todo: catch connection error
 
 function init() {
     canvas = document.getElementById('Canvas');
@@ -34,6 +34,93 @@ function init() {
     createSnake();
     setTimeout("gameCycle()", DELAY);
 }
+
+//game loop
+function gameCycle() {
+    //console.timeEnd("gameCycle");
+    if (inGame) {
+        //console.time("gameCycle");
+        checkSnakeCollision();
+        checkFoodCollision();
+        move();
+        doDrawing();
+        checkfood();
+        info = {
+            "info" : {
+                "snake_pos": [x[0],y[0]],
+                "snake_size": snake_size,
+            },
+        };
+        send_sever(socket, info);
+        //TODO get data from server
+        setTimeout("gameCycle()", DELAY);
+    }
+}
+
+//send data to server
+function send_sever(socket, data) {
+    if (socket.readyState === socket.OPEN) {
+        socket.send(JSON.stringify(data));
+    }
+}
+
+//receive data from server
+socket.onmessage = function(event) {
+    var data = JSON.parse(event.data);
+    console.log(data);
+
+    //getting food from server
+    if (data["food"]) {
+        food_list.push(data["food"]);
+        console.log("got food from server " + food_list);
+    }
+    //getting food list from server
+    if (data["food_list"]) {
+        food_list = data["food_list"];
+        console.log("Got food list from server " + food_list);
+    }
+};
+
+//for debugging
+socket.onclose = function(event) {
+    if (event.wasClean) {
+        console.log(`[close] Connection closed cleanly, code=${event.code}`);
+    } else {
+        // e.g. server process killed or network down
+        // event.code is usually 1006 in this case
+        alert('[close] Connection died');
+    }
+};
+
+//for any websocket error
+socket.onerror = function(error) {
+    alert(`[error] ${error.message}`);
+};
+
+//check if the key is pressed
+onkeydown = function(e) {
+    var key = e.key;
+    if ((key == "ArrowLeft") && (!rightDirection)) {//move left
+        leftDirection = true;
+        upDirection = false;
+        downDirection = false;
+    }
+    if ((key == "ArrowRight") && (!leftDirection)) {//move right
+        rightDirection = true;
+        upDirection = false;
+        downDirection = false;
+    }
+    if ((key == "ArrowUp") && (!downDirection)) {//move up
+        upDirection = true;
+        rightDirection = false;
+        leftDirection = false;
+    }
+    if ((key == "ArrowDown") && (!upDirection)) {//move down
+        downDirection = true;
+        rightDirection = false;
+        leftDirection = false;
+    }
+};
 
 function loadImages() {
     head = new Image();
@@ -118,16 +205,16 @@ function move() {
         }
     }
     if (leftDirection) {
-        x[0] -= BLOCK_SIZE;
+        x[0] -= SNAKE_SPEED;
     }
     if (rightDirection) {
-        x[0] += BLOCK_SIZE;
+        x[0] += SNAKE_SPEED;
     }
     if (upDirection) {
-        y[0] -= BLOCK_SIZE;
+        y[0] -= SNAKE_SPEED;
     }
     if (downDirection) {
-        y[0] += BLOCK_SIZE;
+        y[0] += SNAKE_SPEED;
     }
 }
 
@@ -171,9 +258,7 @@ function checkfood() {
         if (intersect(snake, food)) {
             snake_size++;
             food_list.splice(i, 1);
-            food_info = { "food_eaten" : i};//sending the food index to the server
-            console.log(food_info, " food_info ", socket.readyState === socket.OPEN);
-            send_sever(socket, food_info);
+            send_sever(socket, {"food_eaten" : i});//sending the food index to the server
         }
     }
 }
@@ -193,89 +278,3 @@ function Createfood() {
     food_direction = Math.floor(Math.random() * 3);//0:left, 1:right, 2:up, 3:down
     food_list.push([food_x, food_y, food_direction]);
 }
-
-//game loop
-function gameCycle() {
-    //console.timeEnd("gameCycle");
-    if (inGame) {
-        //console.time("gameCycle");
-        checkSnakeCollision();
-        checkFoodCollision();
-        move();
-        doDrawing();
-        checkfood();
-        info = {
-            "info" : {
-                "snake_pos": [x[0],y[0]],
-                "snake_size": snake_size,
-            },
-        };
-        send_sever(socket, info);
-        //TODO get data from server
-        setTimeout("gameCycle()", DELAY);
-    }
-}
-
-//check if the key is pressed
-onkeydown = function(e) {
-    var key = e.key;
-    if ((key == "ArrowLeft") && (!rightDirection)) {//move left
-        leftDirection = true;
-        upDirection = false;
-        downDirection = false;
-    }
-    if ((key == "ArrowRight") && (!leftDirection)) {//move right
-        rightDirection = true;
-        upDirection = false;
-        downDirection = false;
-    }
-    if ((key == "ArrowUp") && (!downDirection)) {//move up
-        upDirection = true;
-        rightDirection = false;
-        leftDirection = false;
-    }
-    if ((key == "ArrowDown") && (!upDirection)) {//move down
-        downDirection = true;
-        rightDirection = false;
-        leftDirection = false;
-    }
-};
-
-//send data to server
-function send_sever(socket, data) {
-    if (socket.readyState === socket.OPEN) {
-        socket.send(JSON.stringify(data));
-    }
-}
-
-//receive data from server
-socket.onmessage = function(event) {
-    var data = JSON.parse(event.data);
-    console.log(data);
-
-    //getting food data from server
-    if (data["food"]) {
-        food_list.push(data["food"]);
-        console.log("got food from server " + data["food"]);
-        console.log(food_list);
-    }
-    //getting food list from server
-    if (data["food_list"]) {
-        food_list = data["food_list"];
-        console.log("Got food list from server " + food_list);
-    }
-};
-
-socket.onclose = function(event) {
-    if (event.wasClean) {
-        console.log(`[close] Connection closed cleanly, code=${event.code}`);
-    } else {
-        // e.g. server process killed or network down
-        // event.code is usually 1006 in this case
-        alert('[close] Connection died');
-    }
-};
-//for debugging
-socket.onerror = function(error) {
-    alert(`[error] ${error.message}`);
-};
