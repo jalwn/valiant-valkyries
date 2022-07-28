@@ -19,8 +19,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     try:
         while True:
             # Send food data to client
-            foodList = create_food()
-            await send_food_client(websocket, foodList)
+            foods_list = food_list()
+            await send_food_client(websocket, foods_list)
 
             # Recive data from client
             receive_data = await websocket.receive_json()
@@ -36,17 +36,27 @@ async def send_food_client(socket: WebSocket, food_list: List[List[int]]) -> Non
 
 def create_food() -> List[List[int]]:
     """
+    Create one food item for snake to consume.
+
+    List of the form [postion_x, position_y, direction].
+    """
+    ran = random.SystemRandom()
+    r = math.floor(ran.random() * 40)
+    food_x = r * BLOCK_SIZE
+    r = math.floor(ran.random() * 40)
+    food_y = r * BLOCK_SIZE
+    food_direction = math.floor(ran.random() * 3)
+    return [food_x, food_y, food_direction]
+
+
+def food_list() -> List[List[int]]:
+    """
     Create a list of food items for snake to consume.
 
-    Inner list in the form [postion_x, position_y, direction].
+    List of the form [food, food, food ...].
     """
     food_list = []
     for _ in range(3):
-        ran = random.SystemRandom()
-        r = math.floor(ran.random() * 40)
-        food_x = r * BLOCK_SIZE
-        r = math.floor(ran.random() * 40)
-        food_y = r * BLOCK_SIZE
-        food_direction = math.floor(ran.random() * 3)
-        food_list.append([food_x, food_y, food_direction])
+        food = create_food()
+        food_list.append(food)
     return food_list
