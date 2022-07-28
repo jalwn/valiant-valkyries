@@ -1,8 +1,8 @@
 import math
 import random
-import uvicorn
 from typing import List
 
+import uvicorn
 from fastapi import FastAPI, WebSocket
 
 BLOCK_SIZE = 10
@@ -73,6 +73,7 @@ def food_list() -> List[List[int]]:
     print(food_list)
     return food_list
 
-def start():
+
+def start() -> None:
     """Launched with `poetry run start` at root level"""
     uvicorn.run("backend.main:app", port=8000, log_level="info", reload=True)
