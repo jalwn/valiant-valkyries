@@ -37,6 +37,12 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 del foods_list[receive_data["food_eaten"]]
                 foods_list.append(food := create_food())
                 await send_single_food(websocket, food)
+            if "save" in receive_data:
+                # Todo save the score and update the leaderboard
+                print(receive_data["save"])
+            if "Game_Over" in receive_data:
+                # Todo send leaderboard to client
+                print(receive_data["Game_Over"])
 
     except Exception as e:
         print(f"Connection closed with code {e.args[0]}")

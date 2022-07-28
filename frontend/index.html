@@ -1,19 +1,100 @@
 <!DOCTYPE html>
 <html>
+
     <head>
         <title>Snake game</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- http://getbootstrap.com/docs/5.1/ -->
+        <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" rel="stylesheet">
+        <script crossorigin="anonymous"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"></script>
+
+        <!-- Load Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+
         <link href="index.css" rel="stylesheet" type="text/css">
         <script src="main.js"></script>
     </head>
 
     <body onload="init();">
-        <canvas id="Canvas" width="480" height="480">
-        </canvas>
-        <div id="instructions">
-            <b>Instructions :</b><span>Use the arrow keys to move the snake.</span>
+        <div class="modal fade" id="instructions" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="instructionsLabel">Before Playing</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Use the arrow keys to move the snake.</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn mx-auto btn-outline-primary"
+                            data-bs-dismiss="modal">Start</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button id='btn'>START</button>
+        <main class="container py-5 text-center">
+            <div class="row justify-content-center">
+                <div class="col align-self-start">
+                    <!-- `m-3`: margin = 3 * $spacer, for all directions -->
+                    <canvas id="Canvas" width="480" height="480" class="m-3">
+                    </canvas>
+                </div>
+                <div id="score-col" class="col align-self-center">
+                    <div class="p-3" id="score">02:34.59</div>
+                    <table id="scoreboard" class="table table-lg table-hover table-bordered align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">Player</th>
+                                <th scope="col">High Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td scope="row">Anirban</td>
+                                <td>300</td>
+                            </tr>
+                            <tr>
+                                <td scope="row">Anirban</td>
+                                <td>200</td>
+                            </tr>
+                            <tr>
+                                <td scope="row">Legosiv</td>
+                                <td>100</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col align-self-end">
+                    <!-- `py-3`: padding = 2 * $spaces, for y (top and bottom) -->
+                    <!-- `mx-auto`: (center) margin = auto, for x (left and right) -->
+                    <div class="d-flex justify-content-around align-self-center py-2 mx-auto">
+                        <button id="play" class="hide-btn btn btn-primary" type="button">Play Again</button>
+                        <button id="save" class="hide-btn btn btn-primary" type="button" onclick="save();">Save</button>
+                    </div>
+                </div>
+                <div class="col align-self-end">
+                    <form action="" method="post">
+                        <div class="d-flex input-group justify-content-between mb-3 px-5">
+                            <input class="form-control w-auto" id="username" name="username"
+                                placeholder="Enter username" type="text">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
     </body>
+
 </html>
