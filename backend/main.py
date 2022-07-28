@@ -6,6 +6,8 @@ from fastapi import FastAPI, WebSocket
 
 BLOCK_SIZE = 10
 app = FastAPI()
+snake_position = [0, 0]
+snake_size = 0
 
 
 @app.websocket_route("/ws")
@@ -25,7 +27,13 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
             # Recive data from client
             receive_data = await websocket.receive_json()
-            print(receive_data)
+            # print(receive_data)
+            if receive_data["info"]:
+                # todo: save info to the local variable
+                print(receive_data["info"])
+            if receive_data["food_eaten"]:
+                # Todo send a single food item to client
+                print(receive_data["food_eaten"])
 
     except Exception as e:
         print(f"Connection closed with code {e.args[0]}")
@@ -33,7 +41,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
 async def send_food_client(socket: WebSocket, food_list: List[List[int]]) -> None:
     """Send created food data to client."""
-    await socket.send_json({"food": food_list})
+    await socket.send_json({"food_list": food_list})
 
 
 def create_food() -> List[List[int]]:
@@ -61,4 +69,5 @@ def food_list() -> List[List[int]]:
     for _ in range(3):
         food = create_food()
         food_list.append(food)
+    print(food_list)
     return food_list

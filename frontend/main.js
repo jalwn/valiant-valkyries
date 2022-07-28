@@ -6,7 +6,7 @@ var food_img;
 var body;
 var snake_size;
 var food;
-var foods = [];
+var food_list = [];
 var leftDirection = false;
 var rightDirection = true;
 var upDirection = false;
@@ -58,9 +58,9 @@ function doDrawing() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     if (inGame) {
 
-        //draw the foods
-        for (var i = 0; i < foods.length; i++) {
-            food=foods[i];
+        //draw the food_list
+        for (var i = 0; i < food_list.length; i++) {
+            food=food_list[i];
             ctx.drawImage(food_img, food[0], food[1]);
             ctx.strokeStyle = 'green';
             ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
@@ -88,14 +88,14 @@ function gameOver() {
     ctx.textAlign = 'center';
     ctx.font = 'normal bold 18px serif';
     ctx.fillText('Game over', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+    send_sever(socket, {'Game_Over': true});
+    socket.close();
     btn=document.getElementById("btn");
     btn.textContent="Play Again";
     btn.style.display="block";
     btn.onclick=function(){
         location.reload();
     }
-    socket.send(JSON.stringify({ "game_over": true }));
-    socket.close();
 }
 
 function move() {
@@ -104,17 +104,17 @@ function move() {
         x[z] = x[(z - 1)];
         y[z] = y[(z - 1)];
     }
-    //move the foods
-    for (var i = 0; i < foods.length; i++) {
-        food=foods[i]
+    //move the food_list
+    for (var i = 0; i < food_list.length; i++) {
+        food=food_list[i]
         if (food[2] == 0) {
-            foods[i][0] -= FOOD_SPEED;
+            food_list[i][0] -= FOOD_SPEED;
         } else if (food[2] == 1) {
-            foods[i][0] += FOOD_SPEED;
+            food_list[i][0] += FOOD_SPEED;
         } else if (food[2] == 2) {
-            foods[i][1] -= FOOD_SPEED;
+            food_list[i][1] -= FOOD_SPEED;
         } else if (food[2] == 3) {
-            foods[i][1] += FOOD_SPEED;
+            food_list[i][1] += FOOD_SPEED;
         }
     }
     if (leftDirection) {
@@ -149,16 +149,16 @@ function checkSnakeCollision() {
 
 //check if the food hit the wall
 function checkFoodCollision() {
-    for (var i = 0; i < foods.length; i++) {
-        food=foods[i];
+    for (var i = 0; i < food_list.length; i++) {
+        food=food_list[i];
         if (food[0] >= CANVAS_WIDTH) {
-            foods[i][2] = 0;
+            food_list[i][2] = 0;
         } else if (food[0] < 0) {
-            foods[i][2] = 1;
+            food_list[i][2] = 1;
         } else if (food[1] >= CANVAS_HEIGHT) {
-            foods[i][2] = 2;
+            food_list[i][2] = 2;
         } else if (food[1] < 0) {
-            foods[i][2] = 3;
+            food_list[i][2] = 3;
         }
     }
 }
@@ -166,12 +166,14 @@ function checkFoodCollision() {
 //check if the snake hits the food
 function checkfood() {
     snake = [x[0], y[0]];
-    for (var i = 0; i < foods.length; i++) {
-        food = [foods[i][0], foods[i][1]];
+    for (var i = 0; i < food_list.length; i++) {
+        food = [food_list[i][0], food_list[i][1]];
         if (intersect(snake, food)) {
             snake_size++;
-            foods.splice(i, 1);
-            Createfood();
+            food_list.splice(i, 1);
+            food_info = { "food_eaten" : i};//sending the food index to the server
+            console.log(food_info, " food_info ", socket.readyState === socket.OPEN);
+            send_sever(socket, food_info);
         }
     }
 }
@@ -189,7 +191,7 @@ function Createfood() {
     r = Math.floor(Math.random() * 40);
     food_y = r * BLOCK_SIZE;
     food_direction = Math.floor(Math.random() * 3);//0:left, 1:right, 2:up, 3:down
-    foods.push([food_x, food_y, food_direction]);
+    food_list.push([food_x, food_y, food_direction]);
 }
 
 //game loop
@@ -202,8 +204,13 @@ function gameCycle() {
         move();
         doDrawing();
         checkfood();
-        var snake_pos = [x[0],y[0]];
-        send_sever(socket, snake_pos, snake_size, foods);
+        info = {
+            "info" : {
+                "snake_pos": [x[0],y[0]],
+                "snake_size": snake_size,
+            },
+        };
+        send_sever(socket, info);
         //TODO get data from server
         setTimeout("gameCycle()", DELAY);
     }
@@ -235,13 +242,8 @@ onkeydown = function(e) {
 };
 
 //send data to server
-function send_sever(socket, snake_pos, snake_size, food_pos) {
+function send_sever(socket, data) {
     if (socket.readyState === socket.OPEN) {
-        data = {
-            "snake_pos": snake_pos,
-            "snake_size": snake_size,
-            "food_pos": food_pos
-        };
         socket.send(JSON.stringify(data));
     }
 }
@@ -249,10 +251,18 @@ function send_sever(socket, snake_pos, snake_size, food_pos) {
 //receive data from server
 socket.onmessage = function(event) {
     var data = JSON.parse(event.data);
-    //console.log(data);
+    console.log(data);
+
+    //getting food data from server
     if (data["food"]) {
-        foods = data["food"];
-        console.log("got food list from server " + foods);
+        food_list.push(data["food"]);
+        console.log("got food from server " + data["food"]);
+        console.log(food_list);
+    }
+    //getting food list from server
+    if (data["food_list"]) {
+        food_list = data["food_list"];
+        console.log("Got food list from server " + food_list);
     }
 };
 
