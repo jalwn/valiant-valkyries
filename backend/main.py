@@ -10,21 +10,23 @@ app = FastAPI()
 
 @app.websocket_route("/ws")
 async def websocket_endpoint(websocket: WebSocket) -> None:
-    """Websocket server endpoint
+    """
+    Websocket server endpoint.
 
-    This function is called when a websocket connection is made.
+    This is where a websocket connection is made
     and it is used to send and recive data to the client.
     """
     await websocket.accept()
+    # Send food list to client
+    foods_list = food_list()
+    await send_food_client(websocket, foods_list)
     try:
         while True:
-            # Send food data to client
-            foods_list = food_list()
-            await send_food_client(websocket, foods_list)
 
             # Recive data from client
             receive_data = await websocket.receive_json()
             print(receive_data)
+
     except Exception as e:
         print(f"Connection closed with code {e.args[0]}")
 

@@ -32,11 +32,6 @@ function init() {
     ctx = canvas.getContext('2d');
     loadImages();
     createSnake();
-    //Todo: get the food from the server
-    Createfood();
-    Createfood();
-    Createfood();
-    Createfood();
     setTimeout("gameCycle()", DELAY);
 }
 
@@ -255,7 +250,7 @@ function send_sever(socket, snake_pos, snake_size, food_pos) {
 socket.onmessage = function(event) {
     var data = JSON.parse(event.data);
     //console.log(data);
-    if (data.type === "food") {
+    if (data["food"]) {
         foods = data["food"];
         console.log("got food list from server " + foods);
     }
