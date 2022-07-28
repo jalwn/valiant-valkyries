@@ -88,6 +88,7 @@ socket.onmessage = function(event) {
 
 //closing the websocket
 function close_websocket() {
+    send_sever(socket, {'Game_Over': true});
     socket.close();
 }
 
@@ -180,7 +181,6 @@ function doDrawing() {
 }
 
 function gameOver() {
-    send_sever(socket, {'Game_Over': true});
     ctx.fillStyle = 'white';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';

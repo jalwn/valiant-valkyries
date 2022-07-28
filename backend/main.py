@@ -1,6 +1,6 @@
 import math
 import random
-from typing import Dict, List
+from typing import List
 
 import uvicorn
 from fastapi import FastAPI, WebSocket
@@ -9,7 +9,6 @@ BLOCK_SIZE = 10
 app = FastAPI()
 snake_position = [0, 0]
 snake_size = 0
-food_list = []
 
 
 @app.websocket_route("/ws")
@@ -23,7 +22,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     await websocket.accept()
     # Send food list to client
     foods_list = food_list()
-    await send_client(websocket, foods_list)
+    await send_food_client(websocket, foods_list)
     try:
         while True:
 
@@ -34,22 +33,16 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 # todo: save info to the local variable
                 print(receive_data["info"])
             if "food_eaten" in receive_data:
-                # Todo send a single food item to client and remove it from the list
+                # Todo send a single food item to client
                 print(receive_data["food_eaten"])
-            if "save" in receive_data:
-                # Todo save the game and update the leaderboard
-                print(receive_data["save"])
-            if "Game_Over" in receive_data:
-                # Todo send leaderboard to client
-                print(receive_data["Game_Over"])
 
     except Exception as e:
         print(f"Connection closed with code {e.args[0]}")
 
 
-async def send_client(socket: WebSocket, data: Dict) -> None:
-    """Send data to client."""
-    await socket.send_json(data)
+async def send_food_client(socket: WebSocket, food_list: List[List[int]]) -> None:
+    """Send created food data to client."""
+    await socket.send_json({"food_list": food_list})
 
 
 def create_food() -> List[List[int]]:
@@ -73,11 +66,12 @@ def food_list() -> List[List[int]]:
 
     List of the form [food, food, food ...].
     """
-    for _ in range(5):
+    food_list = []
+    for _ in range(3):
         food = create_food()
         food_list.append(food)
     print(food_list)
-    return {"food_list": food_list}
+    return food_list
 
 
 def start() -> None:
