@@ -18,23 +18,22 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     await websocket.accept()
     try:
         while True:
+            # Send food data to client
+            foodList = create_food()
+            await send_food_client(websocket, foodList)
+
             # Recive data from client
             receive_data = await websocket.receive_json()
             print(receive_data)
-            # Todo: take this data and calculate where more food will spawn
-            # and which direction would it move
-
-            # sending dummy data to the client
-            data = {
-                "food": create_food()
-            }
-            await websocket.send_json(data)
-            # Todo: send back the food location and direction where the food will move
     except Exception as e:
         print(f"Connection closed with code {e.args[0]}")
 
 
-# Try to do it functionally and efficiently (cpu budget: 100ms+network budget: 40ms)
+async def send_food_client(socket: WebSocket, food_list: List[List[int]]) -> None:
+    """Send created food data to client."""
+    await socket.send_json({"food": food_list})
+
+
 def create_food() -> List[List[int]]:
     """
     Create a list of food items for snake to consume.
