@@ -52,7 +52,6 @@ function gameCycle() {
             },
         };
         send_sever(socket, info);
-        //TODO get data from server
         setTimeout("gameCycle()", DELAY);
     }
 }
@@ -80,6 +79,12 @@ socket.onmessage = function(event) {
         console.log("Got food list from server " + food_list);
     }
 };
+
+//closing the websocket
+function close_websocket() {
+    send_sever(socket, {'Game_Over': true});
+    socket.close();
+}
 
 //for debugging
 socket.onclose = function(event) {
@@ -175,14 +180,26 @@ function gameOver() {
     ctx.textAlign = 'center';
     ctx.font = 'normal bold 18px serif';
     ctx.fillText('Game over', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-    send_sever(socket, {'Game_Over': true});
-    socket.close();
     btn=document.getElementById("btn");
     btn.textContent="Play Again";
     btn.style.display="block";
     btn.onclick=function(){
+        close_websocket();
         location.reload();
     }
+}
+
+//to send save data to server
+function save() {
+    var user = document.getElementById("user").value;
+    data = {
+        "save": {
+            "user": user,
+            "score": snake_size,
+        },
+    };
+    send_sever(socket, data);
+    close_websocket();
 }
 
 function move() {
