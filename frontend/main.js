@@ -305,16 +305,6 @@ function intersect(a, b) {
     return !(a[0] > b[0] + BLOCK_SIZE || a[0] + BLOCK_SIZE < b[0] || a[1] > b[1] + BLOCK_SIZE || a[1] + BLOCK_SIZE < b[1]);
 }
 
-//random food generation
-//TODO replace with a location from server
-function Createfood() {
-    var r = Math.floor(Math.random() * 40);
-    food_x = r * BLOCK_SIZE;
-    r = Math.floor(Math.random() * 40);
-    food_y = r * BLOCK_SIZE;
-    food_direction = Math.floor(Math.random() * 3);//0:left, 1:right, 2:up, 3:down
-    food_list.push([food_x, food_y, food_direction]);
-}
 
 //cookie functions
 function setCookie(cname, cvalue, exdays) {
