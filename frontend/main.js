@@ -38,7 +38,7 @@ async function init() {
     //check if user existed
     if (getCookie("user")) {
         username = getCookie("user");
-        document.getElementById("user").value = username;
+        document.getElementById("username").value = username;
 }
 }
 
@@ -89,7 +89,6 @@ socket.onmessage = function (event) {
 
 //closing the websocket
 function close_websocket() {
-    send_sever(socket, {'Game_Over': true});
     socket.close();
 }
 
@@ -182,6 +181,7 @@ function doDrawing() {
 }
 
 function gameOver() {
+    send_sever(socket, {'Game_Over': true});
     ctx.fillStyle = 'white';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
@@ -206,10 +206,10 @@ function gameOver() {
 
 //to send save data to server
 function save() {
-    if (document.getElementById("user").value === "") {
+    if (document.getElementById("username").value === "") {
         alert("Please enter your username");
     } else {
-        username = document.getElementById("user").value;
+        username = document.getElementById("username").value;
     }
     data = {
         "save": {
@@ -321,7 +321,7 @@ function setCookie(cname, cvalue, exdays) {
     const d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     let expires = "expires="+d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;SameSite=Strict";
 }
 
 function getCookie(cname) {
