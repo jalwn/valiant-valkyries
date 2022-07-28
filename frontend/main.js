@@ -13,8 +13,8 @@ var upDirection = false;
 var downDirection = false;
 var inGame = true;
 
-const BLOCK_SIZE = 10;//change the block size will also need a change in the images
-const MAX_LENGTH = 100;//max length of the snake
+const BLOCK_SIZE = 10;  //change the block size will also need a change in the images
+const MAX_LENGTH = 100;  //max length of the snake
 const DELAY = 120;
 const CANVAS_HEIGHT = 480;
 const CANVAS_WIDTH = 480;
@@ -27,9 +27,10 @@ var y = new Array(MAX_LENGTH);
 //connect to the server
 let socket = new WebSocket("ws://localhost:8000/ws");
 
-function init() {
+async function init() {
     canvas = document.getElementById('Canvas');
     ctx = canvas.getContext('2d');
+    await displayInstructions();
     loadImages();
     createSnake();
     setTimeout("gameCycle()", DELAY);
@@ -46,8 +47,8 @@ function gameCycle() {
         doDrawing();
         checkfood();
         info = {
-            "info" : {
-                "snake_pos": [x[0],y[0]],
+            "info": {
+                "snake_pos": [x[0], y[0]],
                 "snake_size": snake_size,
             },
         };
@@ -65,7 +66,7 @@ function send_sever(socket, data) {
 }
 
 //receive data from server
-socket.onmessage = function(event) {
+socket.onmessage = function (event) {
     var data = JSON.parse(event.data);
     console.log(data);
 
@@ -82,7 +83,7 @@ socket.onmessage = function(event) {
 };
 
 //for debugging
-socket.onclose = function(event) {
+socket.onclose = function (event) {
     if (event.wasClean) {
         console.log(`[close] Connection closed cleanly, code=${event.code}`);
     } else {
@@ -93,12 +94,12 @@ socket.onclose = function(event) {
 };
 
 //for any websocket error
-socket.onerror = function(error) {
+socket.onerror = function (error) {
     alert(`[error] ${error.message}`);
 };
 
 //check if the key is pressed
-onkeydown = function(e) {
+onkeydown = function (e) {
     var key = e.key;
     if ((key == "ArrowLeft") && (!rightDirection)) {//move left
         leftDirection = true;
@@ -147,21 +148,21 @@ function doDrawing() {
 
         //draw the food_list
         for (var i = 0; i < food_list.length; i++) {
-            food=food_list[i];
+            food = food_list[i];
             ctx.drawImage(food_img, food[0], food[1]);
             ctx.strokeStyle = 'green';
             ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
         }
         //draw the snake
-        for (var z = snake_size-1; z >= 0; z--) {
+        for (var z = snake_size - 1; z >= 0; z--) {
             if (z == 0) {
                 ctx.drawImage(head, x[z], y[z]);
                 ctx.strokeStyle = 'red';
-                ctx.strokeRect( x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+                ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
             } else {
                 ctx.drawImage(body, x[z], y[z]);
                 ctx.strokeStyle = 'blue';
-                ctx.strokeRect( x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+                ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
             }
         }
     } else {
@@ -174,15 +175,23 @@ function gameOver() {
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.font = 'normal bold 18px serif';
-    ctx.fillText('Game over', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-    send_sever(socket, {'Game_Over': true});
+    ctx.fillText('Game over', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+    send_sever(socket, { 'Game_Over': true });
     socket.close();
-    btn=document.getElementById("btn");
-    btn.textContent="Play Again";
-    btn.style.display="block";
-    btn.onclick=function(){
+    play_btn = document.getElementById("play");
+    play_btn.style.display = "inline-block";
+    play_btn.onclick = function () {
         location.reload();
     }
+    // save button
+    save_btn = document.getElementById("save");
+    save_btn.style.display = "inline-block";
+    // hide score
+    score_el = document.getElementById("score");
+    score_el.style.display = "none";
+    // show scoreboard
+    scoreboard_el = document.getElementById("scoreboard");
+    scoreboard_el.style.display = "table";
 }
 
 function move() {
@@ -193,7 +202,7 @@ function move() {
     }
     //move the food_list
     for (var i = 0; i < food_list.length; i++) {
-        food=food_list[i]
+        food = food_list[i]
         if (food[2] == 0) {
             food_list[i][0] -= FOOD_SPEED;
         } else if (food[2] == 1) {
@@ -224,20 +233,20 @@ function checkSnakeCollision() {
         inGame = false;
     }
     if (y[0] < 0) {
-       inGame = false;
+        inGame = false;
     }
     if (x[0] >= CANVAS_WIDTH) {
-      inGame = false;
+        inGame = false;
     }
     if (x[0] < 0) {
-      inGame = false;
+        inGame = false;
     }
 }
 
 //check if the food hit the wall
 function checkFoodCollision() {
     for (var i = 0; i < food_list.length; i++) {
-        food=food_list[i];
+        food = food_list[i];
         if (food[0] >= CANVAS_WIDTH) {
             food_list[i][2] = 0;
         } else if (food[0] < 0) {
@@ -258,13 +267,13 @@ function checkfood() {
         if (intersect(snake, food)) {
             snake_size++;
             food_list.splice(i, 1);
-            send_sever(socket, {"food_eaten" : i});//sending the food index to the server
+            send_sever(socket, { "food_eaten": i });//sending the food index to the server
         }
     }
 }
 
 //fuction to check if a rectangle intersects another rectangle
-function intersect(a,b) {
+function intersect(a, b) {
     return !(a[0] > b[0] + BLOCK_SIZE || a[0] + BLOCK_SIZE < b[0] || a[1] > b[1] + BLOCK_SIZE || a[1] + BLOCK_SIZE < b[1]);
 }
 
@@ -277,4 +286,21 @@ function Createfood() {
     food_y = r * BLOCK_SIZE;
     food_direction = Math.floor(Math.random() * 3);//0:left, 1:right, 2:up, 3:down
     food_list.push([food_x, food_y, food_direction]);
+}
+
+// display instructions to the user before starting the game
+function displayInstructions() {
+    return new Promise((resolve, reject) => {
+        // console.log("display instructions...");
+        const instructions_el = document.getElementById("instructions");
+        const instructions_modal = new bootstrap.Modal(instructions_el, {
+            keyboard: true,
+            focus: true
+        });
+        instructions_modal.show();
+        instructions_el.addEventListener("hidden.bs.modal", (e) => {
+            // console.log("instructions hidden");
+            resolve(null);
+        })
+    })
 }
