@@ -6,6 +6,7 @@ var food_img;
 var body;
 var snake_size;
 var food;
+var username;
 var food_list = [];
 var leftDirection = false;
 var rightDirection = true;
@@ -33,6 +34,11 @@ function init() {
     loadImages();
     createSnake();
     setTimeout("gameCycle()", DELAY);
+    //check if user existed
+    if (getCookie("user")) {
+        username = getCookie("user");
+        document.getElementById("user").value = username;
+}
 }
 
 //game loop
@@ -191,15 +197,20 @@ function gameOver() {
 
 //to send save data to server
 function save() {
-    var user = document.getElementById("user").value;
+    if (document.getElementById("user").value === "") {
+        alert("Please enter your username");
+    } else {
+        username = document.getElementById("user").value;
+    }
     data = {
         "save": {
-            "user": user,
+            "user": username,
             "score": snake_size,
         },
     };
     send_sever(socket, data);
     close_websocket();
+    setCookie("user", username, 90);
 }
 
 function move() {
@@ -294,4 +305,36 @@ function Createfood() {
     food_y = r * BLOCK_SIZE;
     food_direction = Math.floor(Math.random() * 3);//0:left, 1:right, 2:up, 3:down
     food_list.push([food_x, food_y, food_direction]);
+}
+
+//cookie functions
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    const name = cname + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function checkCookie(cname) {
+    const value = getCookie(cname);
+    if (value != "") {
+        return true;
+    } else {
+        return false;
+    }
 }
