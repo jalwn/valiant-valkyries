@@ -28,10 +28,10 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             # Recive data from client
             receive_data = await websocket.receive_json()
             # print(receive_data)
-            if receive_data["info"]:
+            if "info" in receive_data:
                 # todo: save info to the local variable
                 print(receive_data["info"])
-            if receive_data["food_eaten"]:
+            if "food_eaten" in receive_data:
                 # Todo send a single food item to client
                 print(receive_data["food_eaten"])
 
