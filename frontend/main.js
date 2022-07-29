@@ -25,7 +25,7 @@ const MAX_LENGTH = 100;  //max length of the snake
 const DELAY = 120;
 const CANVAS_HEIGHT = 480;
 const CANVAS_WIDTH = 480;
-const SNAKE_SPEED = 8;
+const SNAKE_SPEED = BLOCK_SIZE; //or it tiggers a bug in move function when block size is changed
 const FOOD_SPEED = 4;
 
 var x = new Array(MAX_LENGTH);
@@ -163,9 +163,10 @@ function loadImages() {
 function createSnake() {
     snake_size = 3;
     for (var z = 0; z < snake_size; z++) {
-        x[z] = 50 - z * 10;
+        x[z] = 250 - z * BLOCK_SIZE;
         y[z] = 50;
     }
+    console.log(x, y);
 }
 
 //draw the game
