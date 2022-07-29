@@ -73,7 +73,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
             if "save" in receive_data:
                 score_data = receive_data["save"]
-                save_score(score_data)
+                save_score_ng(score_data)
                 await send_leaderboard(websocket, leaderboard)
                 print("leaderboard: ", leaderboard)
                 await websocket.close()
@@ -162,6 +162,23 @@ def save_score(data: dict) -> None:
             return
 
     leaderboard.append(entry)
+
+
+def save_score_ng(data: dict) -> None:
+    """Save the score for a user into leaderboard.
+
+    Leaderboard is sorted by score in descending order.
+    """
+    # create dict to load file values
+    leaderboard_ng = dict()
+    # load and append to dict, clear file and dump
+    with open('leaderboard.json', 'r+') as f:
+        leaderboard_ng = json.load(f)
+        leaderboard_ng["user_scores"].append(data)
+        f.seek(0)
+        f.truncate(0)
+        json.dump(leaderboard_ng, f, indent=4)
+        f.close()
 
 
 def start() -> None:

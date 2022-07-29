@@ -1,5 +1,20 @@
 {
-    "aaaaa":10,
-    "bbbbbb":3,
-    "ccccc":480
+    "user_scores": [
+        {
+            "user": "mynasmeasasdd",
+            "score": 21150
+        },
+        {
+            "user": "hahaha",
+            "score": 20600
+        },
+        {
+            "user": "asdasd",
+            "score": 18150
+        },
+        {
+            "user": "thisisme",
+            "score": 20600
+        }
+    ]
 }
