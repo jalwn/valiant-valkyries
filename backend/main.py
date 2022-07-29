@@ -9,6 +9,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 BLOCK_SIZE = 10
 app = FastAPI()
 init_snake_size = 3
+init_difficulty = 3*1000  # time in milliseconds
 leaderboard = []
 # leaderboard will be sorted by this key
 LEADERBOARD_SORT_BY = "score"
@@ -16,7 +17,7 @@ LEADERBOARD_SORT_BY = "score"
 
 with open('leaderboard.json', 'r+') as f:
     # leaderboard = json.load(f)
-    # Todo: make it in to list like [[name, score], [name, score], ...]
+    # Todo: make it in from a dict to list like [[name, score], [name, score], ...]
     # sort leaderboard by score in descending order
     print(leaderboard)
 
@@ -38,43 +39,60 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     snake_position = []
     score = 0
     snake_size = init_snake_size
+    difficulty = init_difficulty
     # Send food list to client
     foods_list = food_list()
-    await send_food_client(websocket, foods_list)
+    await send_food_list(websocket, foods_list)
     try:
         while True:
 
             # Recive data from client
             receive_data = await websocket.receive_json()
             # print(receive_data)
+
             if "info" in receive_data:
                 snake_position = receive_data["info"]["snake_pos"]
                 score = receive_data["info"]["score"]
                 print("Snake position: ", snake_position, "| Score: ", score)
+
             if "food_eaten" in receive_data:
-                snake_size += 1
+                food_eaten = foods_list[receive_data["food_eaten"]]
+                if food_eaten[3] == 0:
+                    # reduce difficulty
+                    difficulty = difficulty - 1000
+                    # todo send difficulty to client
+                elif food_eaten[3] == 1:
+                    # increase snake size
+                    snake_size += 4
+                else:
+                    # normal food
+                    snake_size += 1
                 del foods_list[receive_data["food_eaten"]]
-                foods_list.append(food := create_food())
+                foods_list.append(food := create_food(score))
                 await send_single_food(websocket, food)
+
             if "save" in receive_data:
                 score_data = receive_data["save"]
                 save_score(score_data)
                 await send_leaderboard(websocket, leaderboard)
                 print("leaderboard: ", leaderboard)
                 await websocket.close()
+
             if "Game_Over" in receive_data:
                 await send_leaderboard(websocket, leaderboard)
                 print("Gameover: ", receive_data["Game_Over"])
                 snake_position = []
                 score = 0
-                snake_size = init_snake_size
+                snake_size = 3
 
-    except WebSocketDisconnect:
+    except WebSocketDisconnect & Exception as e:
+        if (e):
+            print(e)
         print("Connection closed by client")
 
 
-async def send_food_client(socket: WebSocket, food_list: List[List[int]]) -> None:
-    """Send created food data to client."""
+async def send_food_list(socket: WebSocket, food_list: List[List[int]]) -> None:
+    """Send created food list to client."""
     await socket.send_json({"food_list": food_list})
 
 
@@ -88,19 +106,25 @@ async def send_leaderboard(socket: WebSocket, leaderboard: List[Tuple]) -> None:
     await socket.send_json({"leaderboard": leaderboard})
 
 
-def create_food() -> List[int]:
+def create_food(score: int) -> List[int]:
     """
     Create one food item for snake to consume.
 
-    List of the form [postion_x, position_y, direction].
+    List of the form [postion_x, position_y, direction, food_type].
     """
     ran = random.SystemRandom()
     r = math.floor(ran.random() * 40)
     food_x = r * BLOCK_SIZE
     r = math.floor(ran.random() * 40)
     food_y = r * BLOCK_SIZE
-    food_direction = math.floor(ran.random() * 3)
-    return [food_x, food_y, food_direction]
+    food_direction = math.floor(ran.random() * 4)  # up, down, left, right
+    # current foods 0=reduce difficulty, 1=+4hp, 2=normal
+    # todo add more food types and make the logic better to make the game more fun
+    if score > 2000:
+        food_type = math.floor(ran.random() * 2)  # 0, 1
+    else:
+        food_type = 3
+    return [food_x, food_y, food_direction, food_type]
 
 
 def food_list() -> List[List[int]]:
@@ -111,7 +135,7 @@ def food_list() -> List[List[int]]:
     """
     food_list = []
     for _ in range(5):
-        food = create_food()
+        food = create_food(0)
         food_list.append(food)
     # print(food_list)
     return food_list
