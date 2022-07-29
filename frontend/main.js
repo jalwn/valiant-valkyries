@@ -249,6 +249,9 @@ function gameOver() {
 
     // show cursor
     document.body.style.cursor = "default";
+
+    // stop capturing keystrokes
+    onkeydown = function () {}
 }
 
 //to send save data to server
@@ -409,17 +412,19 @@ function displayInstructions() {
 
 // populate leaderboard table
 function populate_leaderboard_table() {
-    console.log("Running populate_leaderboard_table with data: " + leaderboard);
     const tbody = document.getElementById("leaderboard").tBodies[0];
     tbody.innerHTML = "";
     leaderboard.forEach((entry, i) => {
-        console.log("entry in `leaderboard`: " + entry)
         // append row at the end
         const row = tbody.insertRow(-1);
         // add cells with `leaderboard`
         for (let j = 0; j < entry.length; j++) {
             const cell = row.insertCell(j);
             cell.textContent = String(entry[j]);
+            // add attr `scope="row"` for first cell
+            if (j == 0) {
+                cell.setAttribute("scope", "row");
+            }
         }
     });
 }
