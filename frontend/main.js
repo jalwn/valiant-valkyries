@@ -38,6 +38,8 @@ async function init() {
     canvas = document.getElementById('Canvas');
     ctx = canvas.getContext('2d');
     await displayInstructions();
+    // hide cursor
+    document.body.style.cursor = "none";
     loadImages();
     createSnake();
     setTimeout("gameCycle()", DELAY);
@@ -116,29 +118,35 @@ socket.onclose = function (event) {
 //check if the key is pressed
 onkeydown = function (e) {
     var key = e.key;
-    validMoveKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
-    if (validMoveKeys.includes(key)){ // only prevent default behaviour on move keys
+    upKeys = ["ArrowUp", "w", "W"]
+    downKeys = ["ArrowDown", "s", "S"]
+    leftKeys = ["ArrowLeft", "a", "A"]
+    rightKeys = ["ArrowRight", "d", "D"]
+
+    // prevent default behaviour on move keys
+    if ([...upKeys, ...downKeys, ...leftKeys, ...rightKeys].includes(key)){
+        console.log(`Key ${key} is prevented`);
         e.preventDefault();
     }
-    if ((key == "ArrowLeft") && (!rightDirection)) {//move left
-        leftDirection = true;
-        upDirection = false;
-        downDirection = false;
-    }
-    if ((key == "ArrowRight") && (!leftDirection)) {//move right
-        rightDirection = true;
-        upDirection = false;
-        downDirection = false;
-    }
-    if ((key == "ArrowUp") && (!downDirection)) {//move up
+    if ((upKeys.includes(key)) && (!downDirection)) {       //move up
         upDirection = true;
         rightDirection = false;
         leftDirection = false;
     }
-    if ((key == "ArrowDown") && (!upDirection)) {//move down
+    if ((downKeys.includes(key)) && (!upDirection)) {       //move down
         downDirection = true;
         rightDirection = false;
         leftDirection = false;
+    }
+    if ((leftKeys.includes(key)) && (!rightDirection)) {    //move left
+        leftDirection = true;
+        upDirection = false;
+        downDirection = false;
+    }
+    if ((rightKeys.includes(key)) && (!leftDirection)) {    //move right
+        rightDirection = true;
+        upDirection = false;
+        downDirection = false;
     }
 };
 
@@ -237,6 +245,9 @@ function gameOver() {
     document.getElementById("save").style.display = "inline-block";
     // show form controls
     document.getElementById("username").style.display = "inline-block";
+
+    // show cursor
+    document.body.style.cursor = "default";
 }
 
 //to send save data to server
