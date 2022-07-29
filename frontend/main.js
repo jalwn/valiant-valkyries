@@ -7,6 +7,11 @@ var body;
 var snake_size;
 var food;
 var username;
+var deathReason;
+var scoreIntervalId;
+var reduceIntervalId;
+var score = 0;
+var difficulty = 3*1000;//time in milliseconds
 var food_list = [];
 var leftDirection = false;
 var rightDirection = true;
@@ -35,11 +40,13 @@ async function init() {
     loadImages();
     createSnake();
     setTimeout("gameCycle()", DELAY);
+    scoreIntervalId = setInterval(updateScore, 10);
+    reduceIntervalId = setInterval(reduceSnake, difficulty);
     //check if user existed
     if (getCookie("user")) {
         username = getCookie("user");
-        document.getElementById("user").value = username;
-}
+        document.getElementById("username").value = username;
+    }
 }
 
 //game loop
@@ -47,15 +54,17 @@ function gameCycle() {
     //console.timeEnd("gameCycle");
     if (inGame) {
         //console.time("gameCycle");
+        doDrawing();
+        checkSnakeHealth();
         checkSnakeCollision();
         checkFoodCollision();
+        checkFoodSnakeCollision();
         move();
-        doDrawing();
-        checkfood();
         info = {
             "info": {
                 "snake_pos": [x[0], y[0]],
                 "snake_size": snake_size,
+                "score": score
             },
         };
         send_sever(socket, info);
@@ -78,7 +87,7 @@ socket.onmessage = function (event) {
     //getting food from server
     if (data["food"]) {
         food_list.push(data["food"]);
-        console.log("got food from server " + food_list);
+        //console.log("got food from server " + food_list);
     }
     //getting food list from server
     if (data["food_list"]) {
@@ -89,7 +98,6 @@ socket.onmessage = function (event) {
 
 //closing the websocket
 function close_websocket() {
-    send_sever(socket, {'Game_Over': true});
     socket.close();
 }
 
@@ -155,38 +163,66 @@ function createSnake() {
 //draw the game
 function doDrawing() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    if (inGame) {
+    //draw the snake
+    for (var z = snake_size - 1; z >= 0; z--) {
+        if (z == 0) {
+            ctx.drawImage(head, x[z], y[z]);
+            ctx.strokeStyle = 'red';
+            ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+        } else {
+            ctx.drawImage(body, x[z], y[z]);
+            ctx.strokeStyle = 'blue';
+            ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+        }
+    }
+    //draw the food_list
+    for (var i = 0; i < food_list.length; i++) {
+        food = food_list[i];
+        ctx.drawImage(food_img, food[0], food[1]);
+        ctx.strokeStyle = 'green';
+        ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+    }
+}
 
-        //draw the food_list
-        for (var i = 0; i < food_list.length; i++) {
-            food = food_list[i];
-            ctx.drawImage(food_img, food[0], food[1]);
-            ctx.strokeStyle = 'green';
-            ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
-        }
-        //draw the snake
-        for (var z = snake_size - 1; z >= 0; z--) {
-            if (z == 0) {
-                ctx.drawImage(head, x[z], y[z]);
-                ctx.strokeStyle = 'red';
-                ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
-            } else {
-                ctx.drawImage(body, x[z], y[z]);
-                ctx.strokeStyle = 'blue';
-                ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
-            }
-        }
-    } else {
+//function to update score
+function updateScore() {
+    score+=50;
+    var score_text = String(score/10);
+    while (score_text.length < 6) {
+        score_text = "0" + score_text;
+    }
+    score_text = score_text.slice(0, 2) + ":" + score_text.slice(2, 4) + "." + score_text.slice(4, 6);
+    document.getElementById("score").innerHTML = score_text;
+}
+
+//function to reduce the snake size
+function reduceSnake() {
+    snake_size--;
+    x.pop();
+    y.pop();
+}
+
+//function to check if the snake health is 0
+function checkSnakeHealth() {
+    if (snake_size == 1) {
+        inGame = false;
+        deathReason = "You died of Starvation!";
         gameOver();
     }
 }
 
 function gameOver() {
+    clearInterval(scoreIntervalId);
+    clearInterval(reduceIntervalId);
+    send_sever(socket, {'Game_Over': true});
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     ctx.fillStyle = 'white';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.font = 'normal bold 18px serif';
-    ctx.fillText('Game over', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+    display_text = 'Game over Score: ' + score ;
+    ctx.fillText(display_text, CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+    ctx.fillText(deathReason, CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 20);
     const play_btn = document.getElementById("play");
     play_btn.style.display = "inline-block";
     play_btn.onclick = function () {
@@ -207,15 +243,15 @@ function gameOver() {
 
 //to send save data to server
 function save() {
-    if (document.getElementById("user").value === "") {
+    if (document.getElementById("username").value === "") {
         alert("Please enter your username");
     } else {
-        username = document.getElementById("user").value;
+        username = document.getElementById("username").value;
     }
     data = {
         "save": {
             "user": username,
-            "score": snake_size,
+            "score": score
         },
     };
     send_sever(socket, data);
@@ -258,17 +294,23 @@ function move() {
 
 //check if the snake hits the wall
 function checkSnakeCollision() {
+    var hitWall = false;
     if (y[0] >= CANVAS_HEIGHT) {
-        inGame = false;
+        hitWall = true;
     }
     if (y[0] < 0) {
-        inGame = false;
+        hitWall = true;
     }
     if (x[0] >= CANVAS_WIDTH) {
-        inGame = false;
+        hitWall = true;
     }
     if (x[0] < 0) {
+        hitWall = true;
+    }
+    if (hitWall == true) {
         inGame = false;
+        deathReason = "You died because you hit the poison wall!";
+        gameOver();
     }
 }
 
@@ -289,7 +331,7 @@ function checkFoodCollision() {
 }
 
 //check if the snake hits the food
-function checkfood() {
+function checkFoodSnakeCollision() {
     snake = [x[0], y[0]];
     for (var i = 0; i < food_list.length; i++) {
         food = [food_list[i][0], food_list[i][1]];
@@ -306,23 +348,13 @@ function intersect(a, b) {
     return !(a[0] > b[0] + BLOCK_SIZE || a[0] + BLOCK_SIZE < b[0] || a[1] > b[1] + BLOCK_SIZE || a[1] + BLOCK_SIZE < b[1]);
 }
 
-//random food generation
-//TODO replace with a location from server
-function Createfood() {
-    var r = Math.floor(Math.random() * 40);
-    food_x = r * BLOCK_SIZE;
-    r = Math.floor(Math.random() * 40);
-    food_y = r * BLOCK_SIZE;
-    food_direction = Math.floor(Math.random() * 3);//0:left, 1:right, 2:up, 3:down
-    food_list.push([food_x, food_y, food_direction]);
-}
 
 //cookie functions
 function setCookie(cname, cvalue, exdays) {
     const d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     let expires = "expires="+d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;SameSite=Strict";
 }
 
 function getCookie(cname) {

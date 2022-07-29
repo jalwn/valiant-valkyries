@@ -51,7 +51,7 @@
                     </canvas>
                 </div>
                 <div id="score-col" class="col d-flex align-self-center justify-content-center">
-                    <div class="p-3" id="score">02:34.59</div>
+                    <div class="p-3" id="score">00:00.00</div>
                     <table id="scoreboard" class="hide table table-lg table-hover table-bordered align-middle m-auto">
                         <thead>
                             <tr>
@@ -82,14 +82,13 @@
                     <!-- `mx-auto`: (center) margin = auto, for x (left and right) -->
                     <div class="d-flex justify-content-around align-self-center py-2 mx-auto">
                         <button id="play" class="hide btn btn-primary" type="button">Play Again</button>
-                        <button id="save" class="hide btn btn-success" type="button">Save</button>
+                        <button id="save" class="hide btn btn-success" type="button" onclick="save();">Save</button>
                     </div>
                 </div>
                 <div class="col align-self-end">
                     <div class="d-flex input-group justify-content-between m-2 px-5">
                         <input class="hide form-control w-auto" id="username" name="username"
                             placeholder="Enter username" type="text">
-                        <button id="submit" class="hide btn btn-outline-primary" type="submit">Submit</button>
                     </div>
                 </div>
             </div>
