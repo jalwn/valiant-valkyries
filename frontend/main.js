@@ -112,11 +112,6 @@ socket.onclose = function (event) {
     }
 };
 
-//for any websocket error
-socket.onerror = function (error) {
-    alert(`[error] ${error.message}`);
-};
-
 //check if the key is pressed
 onkeydown = function (e) {
     var key = e.key;
