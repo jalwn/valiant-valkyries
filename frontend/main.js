@@ -84,17 +84,16 @@ function send_sever(socket, data) {
 //receive data from server
 socket.onmessage = function (event) {
     var data = JSON.parse(event.data);
-    console.log(data);
-
+    //console.log(data);
     //getting food from server
     if (data["food"]) {
         food_list.push(data["food"]);
-        //console.log("got food from server " + food_list);
+        //console.log("got food from server " + food[3]);
     }
     //getting food list from server
     if (data["food_list"]) {
         food_list = data["food_list"];
-        console.log("Got food list from server " + food_list);
+        //console.log("Got food list from server " + food_list);
     }
     //getting leaderboard data from server
     if (data["leaderboard"]) {
@@ -125,7 +124,7 @@ onkeydown = function (e) {
 
     // prevent default behaviour on move keys
     if ([...upKeys, ...downKeys, ...leftKeys, ...rightKeys].includes(key)){
-        console.log(`Key ${key} is prevented`);
+        //console.log(`Key ${key} is prevented`);
         e.preventDefault();
     }
     if ((upKeys.includes(key)) && (!downDirection)) {       //move up
@@ -187,7 +186,18 @@ function doDrawing() {
     //draw the food_list
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
-        ctx.drawImage(food_img, food[0], food[1]);
+        if (food[3]  == 0) {
+            //reduce difficulty food
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+        } else if(food[3] == 1) {
+            //add 4hp food
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+        } else {
+            //normal food
+            ctx.drawImage(food_img, food[0], food[1]);
+        }
         ctx.strokeStyle = 'green';
         ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
     }
@@ -348,7 +358,16 @@ function checkFoodSnakeCollision() {
     for (var i = 0; i < food_list.length; i++) {
         food = [food_list[i][0], food_list[i][1]];
         if (intersect(snake, food)) {
-            snake_size++;
+            //do thing depending on the food type
+            console.log("food eaten:"+food_list[i][3]);
+            if (food_list[i][3] == 0) {
+                // todo reduce difficulty
+                console.log("reduce difficulty");
+            } else if (food_list[i][3] == 1) {
+                snake_size+=4;
+            } else {
+                snake_size++;
+            }
             food_list.splice(i, 1);
             send_sever(socket, { "food_eaten": i });//sending the food index to the server
         }
