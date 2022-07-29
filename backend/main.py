@@ -9,6 +9,7 @@ BLOCK_SIZE = 10
 app = FastAPI()
 snake_position = [0, 0]
 snake_size = 0
+leaderboard = {}
 
 
 @app.websocket_route("/ws")
@@ -38,8 +39,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 foods_list.append(food := create_food())
                 await send_single_food(websocket, food)
             if "save" in receive_data:
-                # Todo save the score and update the leaderboard
-                print(receive_data["save"])
+                score_data = receive_data["save"]
+                save_score(score_data)
+                await websocket.close()
             if "Game_Over" in receive_data:
                 # Todo send leaderboard to client
                 print(receive_data["Game_Over"])
@@ -85,6 +87,11 @@ def food_list() -> List[List[int]]:
         food_list.append(food)
     # print(food_list)
     return food_list
+
+
+def save_score(data: dict) -> None:
+    """Save the score for a user into leaderboard."""
+    leaderboard[data["user"]] = data["score"]
 
 
 def start() -> None:
