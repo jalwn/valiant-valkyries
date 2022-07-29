@@ -85,10 +85,11 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 score = 0
                 snake_size = 3
 
-    except WebSocketDisconnect & Exception as e:
-        if (e):
-            print(e)
-        print("Connection closed by client")
+    except Exception as e:
+        if (e == WebSocketDisconnect):
+            print("Connection closed by client")
+        else:
+            print("Error: ", e)
 
 
 async def send_food_list(socket: WebSocket, food_list: List[List[int]]) -> None:
