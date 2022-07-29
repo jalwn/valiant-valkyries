@@ -102,11 +102,6 @@ socket.onmessage = function (event) {
     }
 };
 
-//closing the websocket
-function close_websocket() {
-    socket.close();
-}
-
 //for debugging
 socket.onclose = function (event) {
     if (event.wasClean) {
@@ -227,7 +222,7 @@ function gameOver() {
     const play_btn = document.getElementById("play");
     play_btn.style.display = "inline-block";
     play_btn.onclick = function () {
-        close_websocket();
+        socket.close();
         location.reload();
     }
     // hide score
@@ -254,7 +249,6 @@ function save() {
         },
     };
     send_sever(socket, data);
-    close_websocket();
     setCookie("user", username, 90);
 }
 
