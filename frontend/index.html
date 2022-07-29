@@ -45,14 +45,14 @@
         </div>
         <main class="container py-5 text-center">
             <div class="row justify-content-center">
-                <div class="col align-self-start">
+                <div class="col align-self-start justify-content-center">
                     <!-- `m-3`: margin = 3 * $spacer, for all directions -->
                     <canvas id="Canvas" width="480" height="480" class="m-3">
                     </canvas>
                 </div>
-                <div id="score-col" class="col align-self-center">
-                    <div class="p-3" id="score">02:34.59</div>
-                    <table id="scoreboard" class="table table-lg table-hover table-bordered align-middle">
+                <div id="score-col" class="col d-flex align-self-center justify-content-center">
+                    <div class="p-3" id="score">00:00.00</div>
+                    <table id="scoreboard" class="hide table table-lg table-hover table-bordered align-middle m-auto">
                         <thead>
                             <tr>
                                 <th scope="col">Player</th>
@@ -62,15 +62,15 @@
                         <tbody>
                             <tr>
                                 <td scope="row">Anirban</td>
-                                <td>300</td>
+                                <td>03:38.13</td>
                             </tr>
                             <tr>
                                 <td scope="row">Anirban</td>
-                                <td>200</td>
+                                <td>02:29.53</td>
                             </tr>
                             <tr>
                                 <td scope="row">Legosiv</td>
-                                <td>100</td>
+                                <td>01:46.11</td>
                             </tr>
                         </tbody>
                     </table>
@@ -81,17 +81,15 @@
                     <!-- `py-3`: padding = 2 * $spaces, for y (top and bottom) -->
                     <!-- `mx-auto`: (center) margin = auto, for x (left and right) -->
                     <div class="d-flex justify-content-around align-self-center py-2 mx-auto">
-                        <button id="play" class="hide-btn btn btn-primary" type="button">Play Again</button>
-                        <button id="save" class="hide-btn btn btn-primary" type="button" onclick="save();">Save</button>
+                        <button id="play" class="hide btn btn-primary" type="button">Play Again</button>
+                        <button id="save" class="hide btn btn-success" type="button" onclick="save();">Save</button>
                     </div>
                 </div>
                 <div class="col align-self-end">
-                    <form action="" method="post">
-                        <div class="d-flex input-group justify-content-between mb-3 px-5">
-                            <input class="form-control w-auto" id="username" name="username"
-                                placeholder="Enter username" type="text">
-                        </div>
-                    </form>
+                    <div class="d-flex input-group justify-content-between m-2 px-5">
+                        <input class="hide form-control w-auto" id="username" name="username"
+                            placeholder="Enter username" type="text">
+                    </div>
                 </div>
             </div>
         </main>

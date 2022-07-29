@@ -91,7 +91,7 @@ def food_list() -> List[List[int]]:
     List of the form [food, food, food ...].
     """
     food_list = []
-    for _ in range(3):
+    for _ in range(5):
         food = create_food()
         food_list.append(food)
     # print(food_list)
