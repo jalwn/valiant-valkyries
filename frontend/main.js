@@ -396,6 +396,7 @@ function displayInstructions() {
 function populate_leaderboard_table() {
     console.log("Running populate_leaderboard_table with data: " + leaderboard);
     const tbody = document.getElementById("leaderboard").tBodies[0];
+    tbody.innerHTML = "";
     leaderboard.forEach((entry, i) => {
         console.log("entry in `leaderboard`: " + entry)
         // append row at the end
