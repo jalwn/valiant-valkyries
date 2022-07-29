@@ -64,7 +64,6 @@ function gameCycle() {
         info = {
             "info": {
                 "snake_pos": [x[0], y[0]],
-                "snake_size": snake_size,
                 "score": score
             },
         };

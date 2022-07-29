@@ -3,13 +3,11 @@ import random
 from typing import List, Tuple
 
 import uvicorn
-from fastapi import FastAPI, WebSocket
-from rich import print as pprint
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 BLOCK_SIZE = 10
 app = FastAPI()
-snake_position = [0, 0]
-snake_size = 0
+init_snake_size = 3
 leaderboard = []
 # leaderboard will be sorted by this key
 LEADERBOARD_SORT_BY = "score"
@@ -24,6 +22,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     and it is used to send and recive data to the client.
     """
     await websocket.accept()
+    snake_position = []
+    score = 0
+    snake_size = init_snake_size
     # Send food list to client
     foods_list = food_list()
     await send_food_client(websocket, foods_list)
@@ -34,24 +35,27 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             receive_data = await websocket.receive_json()
             # print(receive_data)
             if "info" in receive_data:
-                # todo: save info to the local variable
-                continue
-                # print(receive_data["info"])
+                snake_position = receive_data["info"]["snake_pos"]
+                score = receive_data["info"]["score"]
+                print("Snake position: ", snake_position, "| Score: ", score)
             if "food_eaten" in receive_data:
+                snake_size += 1
                 del foods_list[receive_data["food_eaten"]]
                 foods_list.append(food := create_food())
                 await send_single_food(websocket, food)
             if "save" in receive_data:
                 score_data = receive_data["save"]
                 save_score(score_data)
-                pprint("leaderboard:", leaderboard)
-                await websocket.close()
+                print("leaderboard: ", leaderboard)
             if "Game_Over" in receive_data:
                 await send_leaderboard(websocket, leaderboard)
-                print(receive_data["Game_Over"])
+                print("Gameover: ", receive_data["Game_Over"])
+                snake_position = []
+                score = 0
+                snake_size = init_snake_size
 
-    except Exception as e:
-        print(f"Connection closed with code {e.args[0]}")
+    except WebSocketDisconnect:
+        print("Connection closed by client")
 
 
 async def send_food_client(socket: WebSocket, food_list: List[List[int]]) -> None:
