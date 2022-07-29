@@ -115,8 +115,11 @@ socket.onclose = function (event) {
 
 //check if the key is pressed
 onkeydown = function (e) {
-    e.preventDefault();
     var key = e.key;
+    validMoveKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
+    if (validMoveKeys.includes(key)){ // only prevent default behaviour on move keys
+        e.preventDefault();
+    }
     if ((key == "ArrowLeft") && (!rightDirection)) {//move left
         leftDirection = true;
         upDirection = false;
