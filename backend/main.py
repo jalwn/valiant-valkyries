@@ -1,3 +1,4 @@
+import json
 import math
 import random
 from typing import List, Tuple
@@ -11,6 +12,18 @@ init_snake_size = 3
 leaderboard = []
 # leaderboard will be sorted by this key
 LEADERBOARD_SORT_BY = "score"
+
+
+with open('leaderboard.json', 'r+') as f:
+    leaderboard = json.load(f)
+    # Todo: make it in to list like [[name, score], [name, score], ...]
+    # sort leaderboard by score in descending order
+    print(leaderboard)
+
+with open("env.json") as j:
+    env = json.load(j)
+    # todo add the env values to the app
+    print(env)
 
 
 @app.websocket_route("/ws")
