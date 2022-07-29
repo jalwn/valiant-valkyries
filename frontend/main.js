@@ -6,6 +6,7 @@ var food_img;
 var body;
 var snake_size;
 var food;
+var leaderboard;
 var username;
 var deathReason;
 var scoreIntervalId;
@@ -93,6 +94,12 @@ socket.onmessage = function (event) {
     if (data["food_list"]) {
         food_list = data["food_list"];
         console.log("Got food list from server " + food_list);
+    }
+    //getting leaderboard data from server
+    if (data["leaderboard"]) {
+        leaderboard = data["leaderboard"];
+        console.log("Got leaderboard from server " + leaderboard);
+        populate_leaderboard_table();
     }
 };
 
@@ -226,14 +233,12 @@ function gameOver() {
     }
     // hide score
     document.getElementById("score").style.display = "none";
-    // show scoreboard
-    document.getElementById("scoreboard").style.display = "table";
+    // show leaderboard
+    document.getElementById("leaderboard").style.display = "table";
     // show save button
     document.getElementById("save").style.display = "inline-block";
     // show form controls
     document.getElementById("username").style.display = "inline-block";
-    document.getElementById("submit").style.display = "inline-block";
-
 }
 
 //to send save data to server
@@ -391,4 +396,20 @@ function displayInstructions() {
             resolve(null);
         })
     })
+}
+
+// populate leaderboard table
+function populate_leaderboard_table() {
+    console.log("Running populate_leaderboard_table with data: " + leaderboard);
+    const tbody = document.getElementById("leaderboard").tBodies[0];
+    leaderboard.forEach((entry, i) => {
+        console.log("entry in `leaderboard`: " + entry)
+        // append row at the end
+        const row = tbody.insertRow(-1);
+        // add cells with `leaderboard`
+        for (let j = 0; j < entry.length; j++) {
+            const cell = row.insertCell(j);
+            cell.textContent = String(entry[j]);
+        }
+    });
 }
