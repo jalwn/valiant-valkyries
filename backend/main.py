@@ -1,9 +1,11 @@
 import math
+import os
 import random
 from typing import List, Tuple
 
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
 
 BLOCK_SIZE = 10
 app = FastAPI()
@@ -11,6 +13,7 @@ init_snake_size = 3
 leaderboard = []
 # leaderboard will be sorted by this key
 LEADERBOARD_SORT_BY = "score"
+BACKEND = os.path.join(os.getcwd(), "frontend")
 
 
 @app.websocket_route("/ws")
@@ -124,6 +127,9 @@ def save_score(data: dict) -> None:
             return
 
     leaderboard.append(entry)
+
+
+app.mount("/", StaticFiles(directory=BACKEND, html=True), name="frontend")
 
 
 def start() -> None:
