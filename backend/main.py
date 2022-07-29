@@ -1,15 +1,18 @@
 import math
 import random
-from typing import List
+from typing import List, Tuple
 
 import uvicorn
 from fastapi import FastAPI, WebSocket
+from rich import print as pprint
 
 BLOCK_SIZE = 10
 app = FastAPI()
 snake_position = [0, 0]
 snake_size = 0
-leaderboard = {}
+leaderboard = []
+# leaderboard will be sorted by this key
+LEADERBOARD_SORT_BY = "score"
 
 
 @app.websocket_route("/ws")
@@ -41,6 +44,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             if "save" in receive_data:
                 score_data = receive_data["save"]
                 save_score(score_data)
+                pprint("leaderboard:", leaderboard)
                 await websocket.close()
             if "Game_Over" in receive_data:
                 # Todo send leaderboard to client
@@ -58,6 +62,11 @@ async def send_food_client(socket: WebSocket, food_list: List[List[int]]) -> Non
 async def send_single_food(socket: WebSocket, food: List[int]) -> None:
     """Send single created food data to client."""
     await socket.send_json({"food": food})
+
+
+async def send_leaderboard(socket: WebSocket, leaderboard: List[Tuple]) -> None:
+    """Send leaderboard data to client."""
+    await socket.send_json({"leaderboard": leaderboard})
 
 
 def create_food() -> List[int]:
@@ -90,8 +99,25 @@ def food_list() -> List[List[int]]:
 
 
 def save_score(data: dict) -> None:
-    """Save the score for a user into leaderboard."""
-    leaderboard[data["user"]] = data["score"]
+    """Save the score for a user into leaderboard.
+
+    Leaderboard is sorted by score in descending order.
+    """
+    # convert dict to tuple of its values
+    entry = tuple(data.values())
+    # currently used sort value
+    sort_value = data[LEADERBOARD_SORT_BY]
+    # index of the `sort_value` in the tuple
+    sort_value_idx = entry.index(sort_value)
+
+    for (i, row) in enumerate(leaderboard):
+        # if the score is lower than the current score
+        # then insert the current entry before it
+        if row[sort_value_idx] < sort_value:
+            leaderboard.insert(i, entry)
+            return
+
+    leaderboard.append(entry)
 
 
 def start() -> None:
