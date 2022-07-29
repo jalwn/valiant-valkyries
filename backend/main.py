@@ -15,7 +15,7 @@ LEADERBOARD_SORT_BY = "score"
 
 
 with open('leaderboard.json', 'r+') as f:
-    leaderboard = json.load(f)
+    # leaderboard = json.load(f)
     # Todo: make it in to list like [[name, score], [name, score], ...]
     # sort leaderboard by score in descending order
     print(leaderboard)
