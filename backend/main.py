@@ -46,7 +46,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             if "save" in receive_data:
                 score_data = receive_data["save"]
                 save_score(score_data)
+                await send_leaderboard(websocket, leaderboard)
                 print("leaderboard: ", leaderboard)
+                await websocket.close()
             if "Game_Over" in receive_data:
                 await send_leaderboard(websocket, leaderboard)
                 print("Gameover: ", receive_data["Game_Over"])
