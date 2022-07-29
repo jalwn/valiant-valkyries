@@ -47,7 +47,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 pprint("leaderboard:", leaderboard)
                 await websocket.close()
             if "Game_Over" in receive_data:
-                # Todo send leaderboard to client
+                await send_leaderboard(websocket, leaderboard)
                 print(receive_data["Game_Over"])
 
     except Exception as e:

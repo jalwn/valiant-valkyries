@@ -243,10 +243,9 @@ function gameOver() {
     document.getElementById("save").style.display = "inline-block";
     // show form controls
     document.getElementById("username").style.display = "inline-block";
-    document.getElementById("submit").style.display = "inline-block";
     // populate leaderboard table
-    populate_leaderboard_table("leaderboard", leaderboard);
-
+    console.log("Before func: ", leaderboard);
+    populate_leaderboard_table();
 }
 
 //to send save data to server
@@ -407,13 +406,14 @@ function displayInstructions() {
 }
 
 // populate leaderboard table
-function populate_leaderboard_table(id, data) {
-    const tbody = document.getElementById(id).tBodies[0];
-    data.forEach((entry, i) => {
-        console.log("entry in data: " + entry)
+function populate_leaderboard_table() {
+    console.log("Running populate_leaderboard_table with data: " + leaderboard);
+    const tbody = document.getElementById("leaderboard").tBodies[0];
+    leaderboard.forEach((entry, i) => {
+        console.log("entry in `leaderboard`: " + entry)
         // append row at the end
         const row = tbody.insertRow(-1);
-        // add cells with data
+        // add cells with `leaderboard`
         for (let j = 0; j < entry.length; j++) {
             const cell = row.insertCell(j);
             cell.textContent = String(entry[j]);
