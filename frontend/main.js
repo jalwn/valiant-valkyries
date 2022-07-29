@@ -187,21 +187,22 @@ function gameOver() {
     ctx.textAlign = 'center';
     ctx.font = 'normal bold 18px serif';
     ctx.fillText('Game over', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-    play_btn = document.getElementById("play");
+    const play_btn = document.getElementById("play");
     play_btn.style.display = "inline-block";
     play_btn.onclick = function () {
         close_websocket();
         location.reload();
     }
-    // save button
-    save_btn = document.getElementById("save");
-    save_btn.style.display = "inline-block";
     // hide score
-    score_el = document.getElementById("score");
-    score_el.style.display = "none";
+    document.getElementById("score").style.display = "none";
     // show scoreboard
-    scoreboard_el = document.getElementById("scoreboard");
-    scoreboard_el.style.display = "table";
+    document.getElementById("scoreboard").style.display = "table";
+    // show save button
+    document.getElementById("save").style.display = "inline-block";
+    // show form controls
+    document.getElementById("username").style.display = "inline-block";
+    document.getElementById("submit").style.display = "inline-block";
+
 }
 
 //to send save data to server
