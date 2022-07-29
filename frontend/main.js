@@ -99,6 +99,7 @@ socket.onmessage = function (event) {
     if (data["leaderboard"]) {
         leaderboard = data["leaderboard"];
         console.log("Got leaderboard from server " + leaderboard);
+        populate_leaderboard_table();
     }
 };
 
@@ -243,9 +244,6 @@ function gameOver() {
     document.getElementById("save").style.display = "inline-block";
     // show form controls
     document.getElementById("username").style.display = "inline-block";
-    // populate leaderboard table
-    console.log("Before func: ", leaderboard);
-    populate_leaderboard_table();
 }
 
 //to send save data to server
