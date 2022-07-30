@@ -208,7 +208,7 @@ function doDrawing() {
             ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
         } else {
             //normal food
-            ctx.drawImage(food_img, food[0], food[1]);
+            ctx.drawImage(food_img, food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
         }
         ctx.strokeStyle = 'green';
         // ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
