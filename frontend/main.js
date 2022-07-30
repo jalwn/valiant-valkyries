@@ -368,14 +368,31 @@ function checkSnakeCollision() {
     var hitWall = false;
     var head_pos = [x[0], y[0]];
     var tail_pos = [x[snake_size - 1], y[snake_size - 1]];
+    // return 0 if no collision, or one of [1,2,3,4] if collision occurs
     checkCollision = (x, y) => {
-        return ((y > CANVAS_HEIGHT - BLOCK_SIZE) || (y < 0) || (x > CANVAS_WIDTH - BLOCK_SIZE) || (x < 0));
+        if (x < 0) { // x too low
+            return 1;
+        }
+        if (x > CANVAS_WIDTH - BLOCK_SIZE) { // x too high
+            return 2;
+        }
+        if (y < 0) { // y too low
+            return 3;
+        }
+        if (y > CANVAS_HEIGHT - BLOCK_SIZE) { // y too high
+            return 4;
+        }
+        return 0;
     }
-    // assign relevant x and or y
     if (bug_feature) {
-        hitWall = checkCollision(...head_pos) && checkCollision(...tail_pos);
+        headHitWall = checkCollision(...head_pos);
+        tailHitWall = checkCollision(...tail_pos);
+        // if "start" is out of canvas,
+        // and both "start" and "end" are out of canvas in the same direction
+        // then snake dies
+        hitWall = ((headHitWall) && (headHitWall == tailHitWall));
     } else {
-        hitWall = checkCollision(...head_pos);
+        hitWall = !!(checkCollision(...head_pos));
     }
     if (hitWall == true) {
         inGame = false;
