@@ -81,26 +81,36 @@ function send_sever(socket, data) {
     }
 }
 
+function updateSnakeReduceInterval(){
+    clearInterval(reduceIntervalId);
+    reduceIntervalId = setInterval(reduceSnake, difficulty);
+}
+
 //receive data from server
 socket.onmessage = function (event) {
     var data = JSON.parse(event.data);
-    console.log(data);
-
+    //console.log(data);
     //getting food from server
     if (data["food"]) {
         food_list.push(data["food"]);
-        //console.log("got food from server " + food_list);
+        //console.log("got food from server " + food[3]);
     }
     //getting food list from server
     if (data["food_list"]) {
         food_list = data["food_list"];
-        console.log("Got food list from server " + food_list);
+        //console.log("Got food list from server " + food_list);
     }
     //getting leaderboard data from server
     if (data["leaderboard"]) {
         leaderboard = data["leaderboard"];
         console.log("Got leaderboard from server " + leaderboard);
         populate_leaderboard_table();
+    }
+    //getting difficulty update data from server
+    if (data["difficulty"]){
+        difficulty = data["difficulty"];
+        console.log("Increasing snake reduce interval to: " + difficulty);
+        updateSnakeReduceInterval();
     }
 };
 
@@ -188,7 +198,18 @@ function doDrawing() {
     //draw the food_list
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
-        ctx.drawImage(food_img, food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+        if (food[3]  == 0) {
+            //reduce gameplay difficulty food
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+        } else if(food[3] == 1) {
+            //add 4hp food
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+        } else {
+            //normal food
+            ctx.drawImage(food_img, food[0], food[1]);
+        }
         ctx.strokeStyle = 'green';
         // ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
     }
@@ -207,9 +228,11 @@ function updateScore() {
 
 //function to reduce the snake size
 function reduceSnake() {
+    //console.timeEnd("reduceSnake");
     snake_size--;
     x.pop();
     y.pop();
+    //console.time("reduceSnake");
 }
 
 //function to check if the snake health is 0
@@ -349,7 +372,15 @@ function checkFoodSnakeCollision() {
     for (var i = 0; i < food_list.length; i++) {
         food = [food_list[i][0], food_list[i][1]];
         if (intersect(snake, food)) {
-            snake_size++;
+            //do thing depending on the food type
+            console.log("food eaten:"+food_list[i][3]);
+            if (food_list[i][3] == 0) {
+                // Difficulty reducing is done in onmessage event
+            } else if (food_list[i][3] == 1) {
+                snake_size+=4;
+            } else {
+                snake_size+=1;
+            }
             food_list.splice(i, 1);
             send_sever(socket, { "food_eaten": i });//sending the food index to the server
         }
