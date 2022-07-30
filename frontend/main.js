@@ -142,7 +142,7 @@ socket.onmessage = function (event) {
     }
     if (data["difficulty"]) {
         difficulty = data["difficulty"];
-        console.log("Increasing snake reduce interval to: " + difficulty);
+        console.log("Game difficulty set to: " + difficulty);
         updateSnakeReduceInterval();
     }
     if (data["bug_feature"]) {
@@ -306,6 +306,7 @@ function reduceSnake() {
     snake_size--;
     x.pop();
     y.pop();
+    send_sever(socket,{"snake_size" : snake_size});
     //console.time("reduceSnake");
 }
 
@@ -481,7 +482,7 @@ function checkFoodSnakeCollision() {
         food = [food_list[i][0], food_list[i][1]];
         if (intersect(snake, food)) {
             //do thing depending on the food type
-            console.log("food eaten:"+food_list[i][3]);
+            //console.log("food eaten:"+food_list[i][3]);
             if (food_list[i][3] == 0) {
                 // Difficulty reducing is done in onmessage event
             } else if (food_list[i][3] == 1) {
