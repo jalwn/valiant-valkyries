@@ -39,10 +39,6 @@ var sounds = {
     }
 }
 
-// sounds.eat_sfx.audio.ended(function(){
-//     sounds.eat_sfx.audio.currentTime = 0;
-//     sounds.eat_sfx.isplaying = false
-// })
 sounds.eat_sfx.audio.addEventListener("ended", function(){
     sounds.eat_sfx.audio.currentTime = 0;
     sounds.eat_sfx.isplaying = false
