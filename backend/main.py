@@ -21,12 +21,6 @@ LEADERBOARD_SORT_BY = "score"
 BACKEND = os.path.join(os.getcwd(), "frontend")
 
 
-with open("env.json") as j:
-    env = json.load(j)
-    # todo add the env values to the app
-    print(env)
-
-
 @app.websocket_route("/ws")
 async def websocket_endpoint(websocket: WebSocket) -> None:
     """
@@ -78,9 +72,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 await send_single_food(websocket, food)
 
             if "save" in receive_data:
-                score_data = receive_data["save"]
-                leaderboard = save_score(score_data, leaderboard)
-                await send_leaderboard(websocket, leaderboard)
+                leaderboard = await save_score(websocket, receive_data["save"], leaderboard)
                 print("leaderboard: ", leaderboard)
                 await websocket.close()
 
@@ -118,6 +110,12 @@ async def update_difficulty(socket: WebSocket, difficulty: int) -> None:
 async def send_bug_feature(socket: WebSocket, bug_feature: bool) -> None:
     """Send bug/feature state to data to client."""
     await socket.send_json({"bug_feature": bug_feature})
+
+
+# send alert to client
+async def send_alert(socket: WebSocket, alert: str) -> None:
+    """Send alert to client."""
+    await socket.send_json({"alert": alert})
 
 
 def create_food(score: int) -> List[int]:
@@ -179,7 +177,7 @@ def food_list() -> List[List[int]]:
     return food_list
 
 
-def save_score(data: dict, list: List) -> List[tuple]:
+async def save_score(websocket: WebSocket, data: dict, list: List) -> List[tuple]:
     """Save the score for a user into leaderboard.
 
     Leaderboard is sorted by score in descending order.
@@ -193,11 +191,11 @@ def save_score(data: dict, list: List) -> List[tuple]:
                 if data["score"] > row[1]:
                     entry = tuple(data.values())
                     list.remove(row)
+                    await send_alert(websocket, "Great you set a new higher score!")
                     break
-                    # todo send the client a message that the score was higher
                 # if not, discard the score
                 else:
-                    # todo send the client a message that the score was lower
+                    await send_alert(websocket, "Sorry! Your score was lower than the previous one :<")
                     entry = None
     # if not, add the user to the leaderboard
     else:
@@ -210,6 +208,8 @@ def save_score(data: dict, list: List) -> List[tuple]:
         # sort by score in descending order
         list.sort(key=lambda x: x[1], reverse=True)
         save_score_to_file(list)
+
+    await send_leaderboard(websocket, list)
     return list
 
 

@@ -149,6 +149,10 @@ socket.onmessage = function (event) {
         bug_feature = data["bug_feature"];
         console.log("Got bug_feature from server: " + bug_feature);
     }
+    if (data["alert"]) {
+        alert(data["alert"]);
+        console.log("Got alert from server: " + data["alert"]);
+    }
 };
 
 //for debugging
@@ -241,7 +245,6 @@ function doDrawing() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     //draw the snake
     for (var z = snake_size - 1; z >= 0; z--) {
-
         if ((z == 0) && !(bug_feature)) {
             //head
             draw(head, x[z], y[z])
@@ -257,7 +260,6 @@ function doDrawing() {
         } else {
             //body
             draw(body, x[z], y[z])
-
         }
     }
     //draw the food_list
@@ -381,9 +383,7 @@ function move() {
     }
     if (rightDirection) {
         x[0] += BLOCK_SIZE;
-        console.log(x)
         updateSpeed(x)
-        console.log(x)
     }
     if (upDirection) {
         y[0] -= BLOCK_SIZE;
