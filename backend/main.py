@@ -6,7 +6,9 @@ from typing import List, Tuple
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
-BLOCK_SIZE = 10
+BLOCK_SIZE = 20
+CANVAS_HEIGHT = 500
+CANVAS_WIDTH = 500
 app = FastAPI()
 init_snake_size = 3
 init_difficulty = 3*1000  # time in milliseconds
@@ -114,12 +116,12 @@ def create_food(score: int) -> List[int]:
     List of the form [postion_x, position_y, direction, food_type].
     """
     ran = random.SystemRandom()
-    r = math.floor(ran.random() * 40)
-    food_x = r * BLOCK_SIZE
-    r = math.floor(ran.random() * 40)
-    food_y = r * BLOCK_SIZE
+    r = math.floor(ran.random() * CANVAS_WIDTH)
+    food_x = r - BLOCK_SIZE
+    r = math.floor(ran.random() * CANVAS_HEIGHT)
+    food_y = r - BLOCK_SIZE
     food_direction = math.floor(ran.random() * 4)  # up, down, left, right
-    # current foods 0=reduce difficulty, 1=+4hp, 2=normal
+    # current foods 0 = reduce difficulty, 1 = +4hp, 2 = normal
     # todo add more food types and make the logic better to make the game more fun
     if score > 2000:
         food_type = math.floor(ran.random() * 2)  # 0, 1

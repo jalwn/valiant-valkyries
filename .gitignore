@@ -32,3 +32,6 @@ build/
 .vscode/
 # MacOS
 .DS_Store
+
+# For raw assets
+frontend/images/raw
