@@ -19,7 +19,7 @@ change origin url before pulling bcs I changed the repo name
 
 3. run `poetry install` to install dependencies
 
-4. run `poetry run api` to run the game
+4. run `poetry run game` to run the game
 
 4. visit `http://127.0.0.1:8000/game/` to play
 
