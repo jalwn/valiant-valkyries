@@ -2,10 +2,12 @@
 var canvas;
 var ctx;
 var head;
+var tail;
 var food_img;
 var body;
 var snake_size;
 var food;
+var bug_feature= false;
 var leaderboard;
 var username;
 var deathReason;
@@ -142,10 +144,15 @@ socket.onmessage = function (event) {
         populate_leaderboard_table();
     }
     //getting difficulty update data from server
-    if (data["difficulty"]){
+    if (data["difficulty"]) {
         difficulty = data["difficulty"];
         console.log("Increasing snake reduce interval to: " + difficulty);
         updateSnakeReduceInterval();
+    }
+    //getting bug_feature from server
+    if (data["bug_feature"]) {
+        bug_feature = data["bug_feature"];
+        console.log("Got bug_feature from server: " + bug_feature);
     }
 };
 
@@ -196,12 +203,32 @@ onkeydown = function (e) {
 };
 
 function loadImages() {
-    head = new Image();
-    head.src = 'images/head.png';
-    body = new Image();
-    body.src = 'images/body.png';
-    food_img = new Image();
-    food_img.src = 'images/yellow-bug.png';
+    //0=up, 1=down, 2=left, 3=right
+    const PREFIX = 'images';
+    loadImageArray = function (folder, n = 4) {
+        // load all imgs `0.png`, `1.png`, ... upto `n.png` under folder `images/${folder}`
+        // NOTE: `path` must NOT contain a trailing slash or backslash
+        let images = [];
+        for (let i = 0; i < n; i++) {
+            let img = new Image();
+            path_i = `${PREFIX}/${folder}/${i}.png`;
+            img.src = path_i;
+            images.push(img);
+        }
+        return images;
+    };
+    head = loadImageArray('head');
+    body = loadImageArray('body');
+    tail = loadImageArray('tail');
+    bug_1hp = loadImageArray('yellow-bug');
+    bug_4hp = loadImageArray('red-bug');
+    bug_easy = loadImageArray('caterpillar');
+    bug_fly = loadImageArray('butterfly');
+
+    // TODO: implement directional head, body, tail images
+    head = head[0];
+    body = body[0];
+    tail = tail[0];
 }
 
 //initialize the snake
@@ -219,37 +246,51 @@ function doDrawing() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     //draw the snake
     for (var z = snake_size - 1; z >= 0; z--) {
-        if (z == 0) {
-            // drawImage(image, x, y, width, height)
-            ctx.drawImage(head, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
-            ctx.strokeStyle = 'red';
-            // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+
+        if ((z == 0) && !(bug_feature)) {
+            //head
+            draw(head, x[z], y[z])
+        } else if ((z == snake_size-1) && !(bug_feature)) {
+            //tail
+            draw(tail, x[z], y[z])
+        } else if ((z == 0) && bug_feature) {
+            //head if bug_feature is true
+            draw(tail, x[z], y[z])
+        } else if ((z == snake_size-1) && bug_feature) {
+            //tail if bug_feature is true
+            draw(head, x[z], y[z])
         } else {
-            ctx.drawImage(body, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
-            ctx.strokeStyle = 'blue';
-            // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            //body
+            draw(body, x[z], y[z])
+
         }
     }
     //draw the food_list
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
+        // food[0]: x, food[1]: y
+        // food[2]: direction (0,1,2,3)
         if (food[3]  == 0) {
-            //reduce gameplay difficulty food
-            ctx.fillStyle = 'red';
-            ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
-        } else if(food[3] == 1) {
-            //add 4hp food
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
-        } else {
-            //normal food
-            ctx.drawImage(food_img, food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+            draw(bug_easy[food[2]], food[0], food[1]);
         }
-        ctx.strokeStyle = 'green';
+        else if(food[3] == 1) {
+            draw(bug_4hp[food[2]], food[0], food[1]);
+        }
+        else if (food[3] == 2) {
+            draw(bug_fly[food[2]], food[0], food[1]);
+        }
+        else if (food[3] == 3) {
+            draw(bug_1hp[food[2]], food[0], food[1]);
+        }
+        // ctx.strokeStyle = 'green';
         // ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
     }
 }
 
+//added a draw function to draw the images
+function draw(img, x, y, width = BLOCK_SIZE, height = BLOCK_SIZE) {
+    ctx.drawImage(img, x, y, width, height);
+}
 //function to update score
 function updateScore() {
     score+=50;
@@ -365,20 +406,36 @@ function move() {
     }
 }
 
-//check if the snake hits the wall
+// check if the snake head hits the wall
 function checkSnakeCollision() {
     var hitWall = false;
-    if (y[0] > CANVAS_HEIGHT - BLOCK_SIZE) {
-        hitWall = true;
+    var head_pos = [x[0], y[0]];
+    var tail_pos = [x[snake_size - 1], y[snake_size - 1]];
+    // return 0 if no collision, or one of [1,2,3,4] if collision occurs
+    checkCollision = (x, y) => {
+        if (x < 0) { // x too low
+            return 1;
+        }
+        if (x > CANVAS_WIDTH - BLOCK_SIZE) { // x too high
+            return 2;
+        }
+        if (y < 0) { // y too low
+            return 3;
+        }
+        if (y > CANVAS_HEIGHT - BLOCK_SIZE) { // y too high
+            return 4;
+        }
+        return 0;
     }
-    if (y[0] < 0) {
-        hitWall = true;
-    }
-    if (x[0] > CANVAS_WIDTH - BLOCK_SIZE) {
-        hitWall = true;
-    }
-    if (x[0] < 0) {
-        hitWall = true;
+    if (bug_feature) {
+        headHitWall = checkCollision(...head_pos);
+        tailHitWall = checkCollision(...tail_pos);
+        // if "start" is out of canvas,
+        // and both "start" and "end" are out of canvas in the same direction
+        // then snake dies
+        hitWall = ((headHitWall) && (headHitWall == tailHitWall));
+    } else {
+        hitWall = !!(checkCollision(...head_pos));
     }
     if (hitWall == true) {
         inGame = false;
@@ -415,7 +472,9 @@ function checkFoodSnakeCollision() {
                 // Difficulty reducing is done in onmessage event
             } else if (food_list[i][3] == 1) {
                 snake_size+=4;
-            } else {
+            } else if (food_list[i][3] == 2) {
+                // changing bugfeature is done in onmessage event
+            } else if (food_list[i][3] == 3){
                 snake_size+=1;
             }
             food_list.splice(i, 1);

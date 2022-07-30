@@ -36,3 +36,4 @@ build/
 # For raw assets
 frontend/images/raw
 rpg_sound_pack
+leaderboard.json
