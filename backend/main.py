@@ -12,13 +12,17 @@ from fastapi.staticfiles import StaticFiles
 BLOCK_SIZE = 20
 CANVAS_HEIGHT = 500
 CANVAS_WIDTH = 500
-app = FastAPI()
-init_snake_size = 3
-init_difficulty = 3*1000  # time in milliseconds
-leaderboard = []
-# leaderboard will be sorted by this key
 LEADERBOARD_SORT_BY = "score"
 BACKEND = os.path.join(os.getcwd(), "frontend")
+app = FastAPI()
+
+snake_position: List[int]
+score: int
+snake_size: int
+difficulty: int
+tigger_bug: bool
+leaderboard: List[Tuple]
+food_list: List[List[int]]
 
 
 @app.websocket_route("/ws")
@@ -32,18 +36,15 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     await websocket.accept()
     snake_position = []
     score = 0
-    snake_size = init_snake_size
-    difficulty = init_difficulty
+    snake_size = 3
+    difficulty = 3*1000  # time in milliseconds
     trigger_bug = False
     leaderboard = load_leaderboard()
     foods_list = food_list()
     await send_food_list(websocket, foods_list)
     try:
         while True:
-
-            # Recive data from client
             receive_data = await websocket.receive_json()
-            # print(receive_data)
 
             if "info" in receive_data:
                 snake_position = receive_data["info"]["snake_pos"]
@@ -123,10 +124,9 @@ async def update_difficulty(socket: WebSocket, difficulty: int) -> None:
 
 async def send_trigger_bug(socket: WebSocket, trigger_bug: bool) -> None:
     """Send bug/feature state to data to client."""
-    await socket.send_json({"trigger_bug": trigger_bug})
+    await socket.send_json({"bug_feature": trigger_bug})
 
 
-# send alert to client
 async def send_alert(socket: WebSocket, alert: str) -> None:
     """Send alert to client."""
     await socket.send_json({"alert": alert})
