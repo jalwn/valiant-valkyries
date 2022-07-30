@@ -108,7 +108,7 @@ async def send_leaderboard(socket: WebSocket, leaderboard: List[Tuple]) -> None:
     await socket.send_json({"leaderboard": leaderboard})
 
 
-async def update_difficulty(socket, difficulty: int):
+async def update_difficulty(socket: WebSocket, difficulty: int) -> None:
     """Send difficulty update data to client."""
     await socket.send_json({"difficulty": difficulty})
 
