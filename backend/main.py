@@ -7,8 +7,8 @@ import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 BLOCK_SIZE = 20
-CANVAS_HEIGHT = 480
-CANVAS_WIDTH = 480
+CANVAS_HEIGHT = 500
+CANVAS_WIDTH = 500
 app = FastAPI()
 init_snake_size = 3
 leaderboard = []

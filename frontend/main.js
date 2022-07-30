@@ -23,8 +23,8 @@ var inGame = true;
 const BLOCK_SIZE = 20;  //change the block size will also need a change in the images
 const MAX_LENGTH = 100;  //max length of the snake
 const DELAY = 120;
-const CANVAS_HEIGHT = 480;
-const CANVAS_WIDTH = 480;
+const CANVAS_HEIGHT = 500;
+const CANVAS_WIDTH = 500;
 const SNAKE_SPEED = BLOCK_SIZE; //or it tiggers a bug in move function when block size is changed
 const FOOD_SPEED = 4;
 
