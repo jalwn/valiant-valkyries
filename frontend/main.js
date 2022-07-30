@@ -156,7 +156,7 @@ function loadImages() {
     body = new Image();
     body.src = 'images/body.png';
     food_img = new Image();
-    food_img.src = 'images/apple.png';
+    food_img.src = 'images/yellow-bug.png';
 }
 
 //initialize the snake
