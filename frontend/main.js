@@ -169,22 +169,32 @@ onkeydown = function (e) {
 
 function loadImages() {
     //0=up, 1=down, 2=left, 3=right
-    head = new Image();
-    head.src = 'images/head.png';
-    body = new Image();
-    body.src = 'images/body.png';
-    tail = new Image();
-    tail.src = 'images/head.png';
-    bug_1hp = new Image();
-    bug_1hp.src = 'images/yellow-bug.png';
-    bug_4hp = new Image();
-    bug_4hp.src = 'images/red-bug.png';
-    bug_easy = new Image();
-    bug_easy.src = 'images/_yellow-bug.png';
-    bug_fly = new Image();
-    bug_fly.src = 'images/butterfly.png';
-    //transform and add images to a array of the same name
-    //bug_fly=[bugfly_up, bugfly_down, bugfly_left, bugfly_right]
+    const PREFIX = 'images';
+    loadImageArray = function (folder, n = 4) {
+        // load all imgs `0.png`, `1.png`, ... upto `n.png` under folder `images/${folder}`
+        // NOTE: `path` must NOT contain a trailing slash or backslash
+        let images = [];
+        for (let i = 0; i < n; i++) {
+            let img = new Image();
+            path_i = `${PREFIX}/${folder}/${i}.png`;
+            img.src = path_i;
+            images.push(img);
+        }
+        return images;
+    };
+    head = loadImageArray('head');
+    body = loadImageArray('body');
+    // TODO: add tail images
+    tail = loadImageArray('head');
+    bug_1hp = loadImageArray('yellow-bug');
+    bug_4hp = loadImageArray('red-bug');
+    bug_easy = loadImageArray('caterpillar');
+    bug_fly = loadImageArray('butterfly');
+
+    // TODO: implement directional head, body, tail images
+    head = head[0];
+    body = body[0];
+    tail = tail[0];
 }
 
 //initialize the snake
@@ -228,24 +238,29 @@ function doDrawing() {
     //draw the food_list
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
+        // food[0]: x, food[1]: y
+        // food[2]: direction (0,1,2,3)
         if (food[3]  == 0) {
-            draw(bug_easy, food[0], food[1]);
-            //draw(bug_easy[food[2]], food[0], food[1]);
-        } else if(food[3] == 1) {
-            draw(bug_4hp, food[0], food[1]);
-        } else if (food[3] == 2) {
-            draw(bug_fly, food[0], food[1]);
-        } else if (food[3] == 3) {
-            draw(bug_1hp, food[0], food[1]);
+            draw(bug_easy[food[2]], food[0], food[1]);
         }
-        //ctx.strokeStyle = 'green';
+        else if(food[3] == 1) {
+            draw(bug_4hp[food[2]], food[0], food[1]);
+            console.log(`Drawing ${bug_4hp[food[2]].src} (food[2] = ${food[2]})`);
+        }
+        else if (food[3] == 2) {
+            draw(bug_fly[food[2]], food[0], food[1]);
+        }
+        else if (food[3] == 3) {
+            draw(bug_1hp[food[2]], food[0], food[1]);
+        }
+        // ctx.strokeStyle = 'green';
         // ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
     }
 }
 
 //added a draw function to draw the images
-function draw(img, x, y) {
-    ctx.drawImage(img, x, y, BLOCK_SIZE, BLOCK_SIZE);
+function draw(img, x, y, width = BLOCK_SIZE, height = BLOCK_SIZE) {
+    ctx.drawImage(img, x, y, width, height);
 }
 //function to update score
 function updateScore() {
