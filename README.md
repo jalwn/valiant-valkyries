@@ -26,3 +26,10 @@ change origin url before pulling bcs I changed the repo name
 ## Gamplay guide
 
 ## Screenshots
+
+## Credits
+
+### sounds used
+1. https://opengameart.org/content/rpg-the-secret-within-the-woods
+2. https://opengameart.org/content/rpg-sound-pack
+3. https://opengameart.org/content/apple-bite

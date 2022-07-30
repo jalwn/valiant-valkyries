@@ -31,6 +31,23 @@ const FOOD_SPEED = 4;
 var x = new Array(MAX_LENGTH);
 var y = new Array(MAX_LENGTH);
 
+// sounds
+var sounds = {
+    eat_sfx: {
+        audio: new Audio('audio/apple_bite.ogg'),
+        isplaying: false,
+    }
+}
+
+// sounds.eat_sfx.audio.ended(function(){
+//     sounds.eat_sfx.audio.currentTime = 0;
+//     sounds.eat_sfx.isplaying = false
+// })
+sounds.eat_sfx.audio.addEventListener("ended", function(){
+    sounds.eat_sfx.audio.currentTime = 0;
+    sounds.eat_sfx.isplaying = false
+})
+
 //connect to the server
 let socket = new WebSocket("ws://localhost:8000/ws");
 
@@ -383,8 +400,18 @@ function checkFoodSnakeCollision() {
             }
             food_list.splice(i, 1);
             send_sever(socket, { "food_eaten": i });//sending the food index to the server
+            play_sound(sounds.eat_sfx)
         }
     }
+}
+
+function play_sound(sound){
+    if (sound.isplaying){
+        sound.audio.pause
+        sound.audio.currentTime = 0;
+    }
+    sound.isplaying = true
+    sound.audio.play()
 }
 
 //fuction to check if a rectangle intersects another rectangle
