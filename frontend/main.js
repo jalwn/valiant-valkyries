@@ -20,7 +20,7 @@ var upDirection = false;
 var downDirection = false;
 var inGame = true;
 
-const BLOCK_SIZE = 16;  //change the block size will also need a change in the images
+const BLOCK_SIZE = 20;  //change the block size will also need a change in the images
 const MAX_LENGTH = 100;  //max length of the snake
 const DELAY = 120;
 const CANVAS_HEIGHT = 480;
@@ -162,12 +162,9 @@ function loadImages() {
 //initialize the snake
 function createSnake() {
     snake_size = 3;
-    // snake must be placed offset by half of its size
-    // so that it lines up the rest of the elements
-    const offset = BLOCK_SIZE / 2
     for (var z = 0; z < snake_size; z++) {
-        x[z] = 250 - z * BLOCK_SIZE + offset;
-        y[z] = 50 + offset;
+        x[z] = 250 - z * BLOCK_SIZE + BLOCK_SIZE / 2;
+        y[z] = 50 + BLOCK_SIZE / 2;
     }
     console.log(x, y);
 }
@@ -181,11 +178,11 @@ function doDrawing() {
             // drawImage(image, x, y, width, height)
             ctx.drawImage(head, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
             ctx.strokeStyle = 'red';
-            ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         } else {
             ctx.drawImage(body, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
             ctx.strokeStyle = 'blue';
-            ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         }
     }
     //draw the food_list
@@ -193,7 +190,7 @@ function doDrawing() {
         food = food_list[i];
         ctx.drawImage(food_img, food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
         ctx.strokeStyle = 'green';
-        ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+        // ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
     }
 }
 
@@ -232,7 +229,7 @@ function gameOver() {
     ctx.fillStyle = 'white';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.font = 'normal bold 18px serif';
+    ctx.font = "normal bold 22px sans-serif";
     display_text = 'Game over Score: ' + score ;
     ctx.fillText(display_text, CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
     ctx.fillText(deathReason, CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 20);

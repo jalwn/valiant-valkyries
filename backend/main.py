@@ -6,7 +6,7 @@ from typing import List, Tuple
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
-BLOCK_SIZE = 16
+BLOCK_SIZE = 20
 CANVAS_HEIGHT = 480
 CANVAS_WIDTH = 480
 app = FastAPI()
