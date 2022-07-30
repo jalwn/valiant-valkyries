@@ -129,7 +129,7 @@ def save_score(data: dict) -> None:
     leaderboard.append(entry)
 
 
-app.mount("/", StaticFiles(directory=BACKEND, html=True), name="frontend")
+app.mount("/game", StaticFiles(directory="frontend", html=True), name="game")
 
 
 def start() -> None:
