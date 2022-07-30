@@ -6,7 +6,9 @@ from typing import List, Tuple
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
-BLOCK_SIZE = 10
+BLOCK_SIZE = 16
+CANVAS_HEIGHT = 480
+CANVAS_WIDTH = 480
 app = FastAPI()
 init_snake_size = 3
 leaderboard = []
@@ -95,10 +97,10 @@ def create_food() -> List[int]:
     List of the form [postion_x, position_y, direction].
     """
     ran = random.SystemRandom()
-    r = math.floor(ran.random() * 40)
-    food_x = r * BLOCK_SIZE
-    r = math.floor(ran.random() * 40)
-    food_y = r * BLOCK_SIZE
+    r = math.floor(ran.random() * CANVAS_WIDTH)
+    food_x = r - BLOCK_SIZE
+    r = math.floor(ran.random() * CANVAS_HEIGHT)
+    food_y = r - BLOCK_SIZE
     food_direction = math.floor(ran.random() * 3)
     return [food_x, food_y, food_direction]
 
