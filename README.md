@@ -33,3 +33,5 @@ change origin url before pulling bcs I changed the repo name
 1. https://opengameart.org/content/rpg-the-secret-within-the-woods
 2. https://opengameart.org/content/rpg-sound-pack
 3. https://opengameart.org/content/apple-bite
+4. https://opengameart.org/content/8bit-death-whirl (death sound)
+5. https://freesound.org/people/Slaking_97/sounds/455109/ (background music)
