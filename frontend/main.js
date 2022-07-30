@@ -42,7 +42,7 @@ var sounds = {
         isplaying: false,
     },
     death_sfx: {
-        audio: new Audio('audio/vgdeathsound.ogg'),
+        audio: new Audio('audio/death.ogg'),
         isplaying: false,
     },
     integer_overflow_sfx: {
