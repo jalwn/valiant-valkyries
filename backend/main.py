@@ -1,10 +1,12 @@
 import json
 import math
+import os
 import random
 from typing import List, Tuple
 
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
 
 BLOCK_SIZE = 20
 CANVAS_HEIGHT = 500
@@ -15,6 +17,7 @@ init_difficulty = 3*1000  # time in milliseconds
 leaderboard = []
 # leaderboard will be sorted by this key
 LEADERBOARD_SORT_BY = "score"
+BACKEND = os.path.join(os.getcwd(), "frontend")
 
 
 with open("env.json") as j:
@@ -203,6 +206,9 @@ def load_leaderboard() -> List[Tuple]:
     for i, row in enumerate(leaderboard):
         leaderboard[i] = tuple(row.values())
     return leaderboard
+
+
+app.mount("/game", StaticFiles(directory="frontend", html=True), name="game")
 
 
 def start() -> None:
