@@ -363,38 +363,19 @@ function move() {
     }
 }
 
-//check if the snake hits the wall
+// check if the snake head hits the wall
 function checkSnakeCollision() {
     var hitWall = false;
-    //check if the snake tail hits the wall
+    var head_pos = [x[0], y[0]];
+    var tail_pos = [x[snake_size - 1], y[snake_size - 1]];
+    checkCollision = (x, y) => {
+        return ((y > CANVAS_HEIGHT - BLOCK_SIZE) || (y < 0) || (x > CANVAS_WIDTH - BLOCK_SIZE) || (x < 0));
+    }
+    // assign relevant x and or y
     if (bug_feature) {
-        tail = snake_size - 1;
-        if (x[tail] < 0) {
-            hitWall = true;
-        }
-        if (x[tail] > CANVAS_WIDTH - BLOCK_SIZE) {
-            hitWall = true;
-        }
-        if (y[tail] < 0) {
-            hitWall = true;
-        }
-        if (y[tail] > CANVAS_HEIGHT - BLOCK_SIZE) {
-            hitWall = true;
-        }
-
+        hitWall = checkCollision(...head_pos) && checkCollision(...tail_pos);
     } else {
-        if (y[0] > CANVAS_HEIGHT - BLOCK_SIZE) {
-            hitWall = true;
-        }
-        if (y[0] < 0) {
-            hitWall = true;
-        }
-        if (x[0] > CANVAS_WIDTH - BLOCK_SIZE) {
-            hitWall = true;
-        }
-        if (x[0] < 0) {
-            hitWall = true;
-        }
+        hitWall = checkCollision(...head_pos);
     }
     if (hitWall == true) {
         inGame = false;
