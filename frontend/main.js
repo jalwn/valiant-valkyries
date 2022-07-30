@@ -108,7 +108,7 @@ socket.onmessage = function (event) {
     }
     //getting difficulty update data from server
     if (data["difficulty"]){
-        difficulty += 1000; // Currently, difficulty change is a constant of 1000, so it is not calculated properly
+        difficulty = data["difficulty"];
         console.log("Increasing snake reduce interval to: " + difficulty);
         updateSnakeReduceInterval();
     }
@@ -198,7 +198,7 @@ function doDrawing() {
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
         if (food[3]  == 0) {
-            //reduce difficulty food
+            //reduce gameplay difficulty food
             ctx.fillStyle = 'red';
             ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
         } else if(food[3] == 1) {
@@ -227,9 +227,11 @@ function updateScore() {
 
 //function to reduce the snake size
 function reduceSnake() {
+    //console.timeEnd("reduceSnake");
     snake_size--;
     x.pop();
     y.pop();
+    //console.time("reduceSnake");
 }
 
 //function to check if the snake health is 0
@@ -375,12 +377,8 @@ function checkFoodSnakeCollision() {
                 // Difficulty reducing is done in onmessage event
             } else if (food_list[i][3] == 1) {
                 snake_size+=4;
-                difficulty -= 1000;
-                updateSnakeReduceInterval();
             } else {
-                snake_size++;
-                difficulty -= 250;
-                updateSnakeReduceInterval();
+                snake_size+=1;
             }
             food_list.splice(i, 1);
             send_sever(socket, { "food_eaten": i });//sending the food index to the server

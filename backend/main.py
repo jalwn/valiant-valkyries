@@ -58,9 +58,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             if "food_eaten" in receive_data:
                 food_eaten = foods_list[receive_data["food_eaten"]]
                 if food_eaten[3] == 0:
-                    # reduce difficulty
-                    difficulty = difficulty - 1000
-                    # todo send difficulty to client
+                    # reduce gameplay difficulty
+                    difficulty += 2000
                     await update_difficulty(websocket, difficulty)
                 elif food_eaten[3] == 1:
                     # increase snake size
