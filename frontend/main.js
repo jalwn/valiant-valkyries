@@ -20,7 +20,7 @@ var upDirection = false;
 var downDirection = false;
 var inGame = true;
 
-const BLOCK_SIZE = 10;  //change the block size will also need a change in the images
+const BLOCK_SIZE = 16;  //change the block size will also need a change in the images
 const MAX_LENGTH = 100;  //max length of the snake
 const DELAY = 120;
 const CANVAS_HEIGHT = 480;
@@ -125,7 +125,7 @@ onkeydown = function (e) {
 
     // prevent default behaviour on move keys
     if ([...upKeys, ...downKeys, ...leftKeys, ...rightKeys].includes(key)){
-        console.log(`Key ${key} is prevented`);
+        // console.log(`Key ${key} is prevented`);
         e.preventDefault();
     }
     if ((upKeys.includes(key)) && (!downDirection)) {       //move up
@@ -162,9 +162,12 @@ function loadImages() {
 //initialize the snake
 function createSnake() {
     snake_size = 3;
+    // snake must be placed offset by half of its size
+    // so that it lines up the rest of the elements
+    const offset = BLOCK_SIZE / 2
     for (var z = 0; z < snake_size; z++) {
-        x[z] = 250 - z * BLOCK_SIZE;
-        y[z] = 50;
+        x[z] = 250 - z * BLOCK_SIZE + offset;
+        y[z] = 50 + offset;
     }
     console.log(x, y);
 }
@@ -175,11 +178,12 @@ function doDrawing() {
     //draw the snake
     for (var z = snake_size - 1; z >= 0; z--) {
         if (z == 0) {
-            ctx.drawImage(head, x[z], y[z]);
+            // drawImage(image, x, y, width, height)
+            ctx.drawImage(head, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
             ctx.strokeStyle = 'red';
             ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         } else {
-            ctx.drawImage(body, x[z], y[z]);
+            ctx.drawImage(body, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
             ctx.strokeStyle = 'blue';
             ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         }
@@ -187,7 +191,7 @@ function doDrawing() {
     //draw the food_list
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
-        ctx.drawImage(food_img, food[0], food[1]);
+        ctx.drawImage(food_img, food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
         ctx.strokeStyle = 'green';
         ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
     }
@@ -307,13 +311,13 @@ function move() {
 //check if the snake hits the wall
 function checkSnakeCollision() {
     var hitWall = false;
-    if (y[0] >= CANVAS_HEIGHT) {
+    if (y[0] > CANVAS_HEIGHT - BLOCK_SIZE) {
         hitWall = true;
     }
     if (y[0] < 0) {
         hitWall = true;
     }
-    if (x[0] >= CANVAS_WIDTH) {
+    if (x[0] > CANVAS_WIDTH - BLOCK_SIZE) {
         hitWall = true;
     }
     if (x[0] < 0) {
@@ -330,11 +334,11 @@ function checkSnakeCollision() {
 function checkFoodCollision() {
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
-        if (food[0] >= CANVAS_WIDTH) {
+        if (food[0] > CANVAS_WIDTH - BLOCK_SIZE) {
             food_list[i][2] = 0;
         } else if (food[0] < 0) {
             food_list[i][2] = 1;
-        } else if (food[1] >= CANVAS_HEIGHT) {
+        } else if (food[1] > CANVAS_HEIGHT - BLOCK_SIZE) {
             food_list[i][2] = 2;
         } else if (food[1] < 0) {
             food_list[i][2] = 3;
