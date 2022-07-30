@@ -184,8 +184,7 @@ function loadImages() {
     };
     head = loadImageArray('head');
     body = loadImageArray('body');
-    // TODO: add tail images
-    tail = loadImageArray('head');
+    tail = loadImageArray('tail');
     bug_1hp = loadImageArray('yellow-bug');
     bug_4hp = loadImageArray('red-bug');
     bug_easy = loadImageArray('caterpillar');
@@ -218,16 +217,12 @@ function doDrawing() {
             draw(head, x[z], y[z])
         } else if ((z == snake_size-1) && !(bug_feature)) {
             //tail
-            //draw(tail, x[z], y[z])
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            draw(tail, x[z], y[z])
         } else if ((z == 0) && bug_feature) {
             //head if bug_feature is true
-            //draw(tail, x[z], y[z])
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            draw(tail, x[z], y[z])
         } else if ((z == snake_size-1) && bug_feature) {
-            //head if bug_feature is true
+            //tail if bug_feature is true
             draw(head, x[z], y[z])
         } else {
             //body
@@ -245,7 +240,6 @@ function doDrawing() {
         }
         else if(food[3] == 1) {
             draw(bug_4hp[food[2]], food[0], food[1]);
-            console.log(`Drawing ${bug_4hp[food[2]].src} (food[2] = ${food[2]})`);
         }
         else if (food[3] == 2) {
             draw(bug_fly[food[2]], food[0], food[1]);
