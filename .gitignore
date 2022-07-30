@@ -35,3 +35,4 @@ build/
 
 # For raw assets
 frontend/images/raw
+leaderboard.json
