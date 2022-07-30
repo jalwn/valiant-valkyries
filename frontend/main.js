@@ -7,7 +7,7 @@ var food_img;
 var body;
 var snake_size;
 var food;
-var bug_feature= true;
+var bug_feature= false;
 var leaderboard;
 var username;
 var deathReason;

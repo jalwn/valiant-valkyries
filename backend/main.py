@@ -40,6 +40,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     score = 0
     snake_size = init_snake_size
     difficulty = init_difficulty
+    bug_feature = False
     leaderboard = load_leaderboard()
     foods_list = food_list()
     await send_food_list(websocket, foods_list)
@@ -64,6 +65,11 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 elif food_eaten[3] == 1:
                     # increase snake size
                     snake_size += 4
+                elif food_eaten[3] == 2:
+                    # add a bug feature
+                    bug_feature = not bug_feature
+                    print(bug_feature)
+                    await send_bug_feature(websocket, bug_feature)
                 else:
                     # normal food
                     snake_size += 1
@@ -107,6 +113,11 @@ async def send_leaderboard(socket: WebSocket, leaderboard: List[Tuple]) -> None:
 async def update_difficulty(socket: WebSocket, difficulty: int) -> None:
     """Send difficulty update data to client."""
     await socket.send_json({"difficulty": difficulty})
+
+
+async def send_bug_feature(socket: WebSocket, bug_feature: bool) -> None:
+    """Send bug/feature state to data to client."""
+    await socket.send_json({"bug_feature": bug_feature})
 
 
 def create_food(score: int) -> List[int]:
