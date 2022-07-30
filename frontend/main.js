@@ -174,8 +174,14 @@ function loadImages() {
     body.src = 'images/body.png';
     tail = new Image();
     tail.src = 'images/head.png';
-    food_img = new Image();
-    food_img.src = 'images/yellow-bug.png';
+    bug_1hp = new Image();
+    bug_1hp.src = 'images/yellow-bug.png';
+    bug_4hp = new Image();
+    bug_4hp.src = 'images/red-bug.png';
+    bug_easy = new Image();
+    bug_easy.src = 'images/_yellow-bug.png';
+    bug_fly = new Image();
+    bug_fly.src = 'images/butterfly.png';
 }
 
 //initialize the snake
@@ -197,28 +203,28 @@ function doDrawing() {
         if ((z == 0) && !(bug_feature)) {
             //head
             // drawImage(image, x, y, width, height)
-            ctx.drawImage(head, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            draw(head, x[z], y[z])
             ctx.strokeStyle = 'red';
             // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         } else if ((z == snake_size-1) && !(bug_feature)) {
             //tail
-            //ctx.drawImage(tail, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            //draw(tail, x[z], y[z])
             ctx.fillStyle = 'blue';
             ctx.fillRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         } else if ((z == 0) && bug_feature) {
             //head if bug_feature is true
-            //ctx.drawImage(tail, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            //draw(tail, x[z], y[z])
             ctx.fillStyle = 'blue';
             ctx.fillRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         } else if ((z == snake_size-1) && bug_feature) {
             //tail if bug_feature is true
            // drawImage(image, x, y, width, height)
-           ctx.drawImage(head, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+           draw(head, x[z], y[z])
            ctx.strokeStyle = 'red';
            // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         } else {
             //body
-            ctx.drawImage(body, x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            draw(body, x[z], y[z])
             ctx.strokeStyle = 'blue';
             // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         }
@@ -227,22 +233,23 @@ function doDrawing() {
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
         if (food[3]  == 0) {
-            //reduce gameplay difficulty food
-            ctx.fillStyle = 'red';
-            ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+            draw(bug_easy, food[0], food[1]);
         } else if(food[3] == 1) {
-            //add 4hp food
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
-        } else {
-            //normal food
-            ctx.drawImage(food_img, food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
+            draw(bug_4hp, food[0], food[1]);
+        } else if (food[3] == 2) {
+            draw(bug_fly, food[0], food[1]);
+        } else if (food[3] == 3) {
+            draw(bug_1hp, food[0], food[1]);
         }
-        ctx.strokeStyle = 'green';
+        //ctx.strokeStyle = 'green';
         // ctx.strokeRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
     }
 }
 
+//added a draw function to draw the images
+function draw(img, x, y) {
+    ctx.drawImage(img, x, y, BLOCK_SIZE, BLOCK_SIZE);
+}
 //function to update score
 function updateScore() {
     score+=50;
@@ -421,12 +428,12 @@ function checkFoodSnakeCollision() {
             //do thing depending on the food type
             console.log("food eaten:"+food_list[i][3]);
             if (food_list[i][3] == 0) {
-                // change the bugfeature is done in onmessage event
-            } else if (food_list[i][3] == 0) {
                 // Difficulty reducing is done in onmessage event
             } else if (food_list[i][3] == 1) {
                 snake_size+=4;
-            } else {
+            } else if (food_list[i][3] == 2) {
+                // changing bugfeature is done in onmessage event
+            } else if (food_list[i][3] == 3){
                 snake_size+=1;
             }
             food_list.splice(i, 1);

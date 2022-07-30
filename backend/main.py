@@ -128,6 +128,8 @@ def create_food(score: int) -> List[int]:
     # todo add more food types and make the logic better to make the game more fun
     if score > 2000:
         food_type = math.floor(ran.random() * 2)  # 0, 1
+    elif score > 10000:
+        food_type = 2
     else:
         food_type = 3
     return [food_x, food_y, food_direction, food_type]
