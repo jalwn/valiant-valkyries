@@ -44,6 +44,10 @@ var sounds = {
     death_sfx: {
         audio: new Audio('audio/vgdeathsound.ogg'),
         isplaying: false,
+    },
+    integer_overflow: {
+        audio: new Audio('audio/magnet_action.wav'),
+        isplaying: false,
     }
 }
 
