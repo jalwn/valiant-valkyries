@@ -183,6 +183,8 @@ function loadImages() {
     bug_easy.src = 'images/_yellow-bug.png';
     bug_fly = new Image();
     bug_fly.src = 'images/butterfly.png';
+    //transform and add images to a array of the same name
+    //bug_fly=[bugfly_up, bugfly_down, bugfly_left, bugfly_right]
 }
 
 //initialize the snake
@@ -228,6 +230,7 @@ function doDrawing() {
         food = food_list[i];
         if (food[3]  == 0) {
             draw(bug_easy, food[0], food[1]);
+            //draw(bug_easy[food[2]], food[0], food[1]);
         } else if(food[3] == 1) {
             draw(bug_4hp, food[0], food[1]);
         } else if (food[3] == 2) {
