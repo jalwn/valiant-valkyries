@@ -1,5 +1,16 @@
 {
-    "aaaaa":10,
-    "bbbbbb":3,
-    "ccccc":480
+    "user_scores": [
+        {
+            "hahaha": "high",
+            "20600": 20600
+        },
+        {
+            "hahaha": "mid",
+            "20600": 14150
+        },
+        {
+            "hahaha": "low",
+            "20600": 2600
+        }
+    ]
 }
