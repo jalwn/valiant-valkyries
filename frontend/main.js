@@ -81,6 +81,11 @@ function send_sever(socket, data) {
     }
 }
 
+function updateSnakeReduceInterval(){
+    clearInterval(reduceIntervalId);
+    reduceIntervalId = setInterval(reduceSnake, difficulty);
+}
+
 //receive data from server
 socket.onmessage = function (event) {
     var data = JSON.parse(event.data);
@@ -100,6 +105,12 @@ socket.onmessage = function (event) {
         leaderboard = data["leaderboard"];
         console.log("Got leaderboard from server " + leaderboard);
         populate_leaderboard_table();
+    }
+    //getting difficulty update data from server
+    if (data["difficulty"]){
+        difficulty += 1000; // Currently, difficulty change is a constant of 1000, so it is not calculated properly
+        console.log("Increasing snake reduce interval to: " + difficulty);
+        updateSnakeReduceInterval();
     }
 };
 
@@ -361,12 +372,15 @@ function checkFoodSnakeCollision() {
             //do thing depending on the food type
             console.log("food eaten:"+food_list[i][3]);
             if (food_list[i][3] == 0) {
-                // todo reduce difficulty
-                console.log("reduce difficulty");
+                // Difficulty reducing is done in onmessage event
             } else if (food_list[i][3] == 1) {
                 snake_size+=4;
+                difficulty -= 1000;
+                updateSnakeReduceInterval();
             } else {
                 snake_size++;
+                difficulty -= 250;
+                updateSnakeReduceInterval();
             }
             food_list.splice(i, 1);
             send_sever(socket, { "food_eaten": i });//sending the food index to the server
