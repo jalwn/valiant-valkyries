@@ -27,7 +27,7 @@ const MAX_LENGTH = 100;  //max length of the snake
 const DELAY = 120;
 const CANVAS_HEIGHT = 500;
 const CANVAS_WIDTH = 500;
-const SNAKE_SPEED = BLOCK_SIZE; //or it tiggers a bug in move function when block size is changed
+const SNAKE_SPEED = 6; // real speed of the snake = block size-snake speed = 20-6 =14
 const FOOD_SPEED = 4;
 
 var x = new Array(MAX_LENGTH);
@@ -127,29 +127,24 @@ function updateSnakeReduceInterval(){
 socket.onmessage = function (event) {
     var data = JSON.parse(event.data);
     //console.log(data);
-    //getting food from server
     if (data["food"]) {
         food_list.push(data["food"]);
-        //console.log("got food from server " + food[3]);
+        console.log("got food from server " + food[3]);
     }
-    //getting food list from server
     if (data["food_list"]) {
         food_list = data["food_list"];
-        //console.log("Got food list from server " + food_list);
+        console.log("Got food list from server " + food_list);
     }
-    //getting leaderboard data from server
     if (data["leaderboard"]) {
         leaderboard = data["leaderboard"];
         console.log("Got leaderboard from server " + leaderboard);
         populate_leaderboard_table();
     }
-    //getting difficulty update data from server
     if (data["difficulty"]) {
         difficulty = data["difficulty"];
         console.log("Increasing snake reduce interval to: " + difficulty);
         updateSnakeReduceInterval();
     }
-    //getting bug_feature from server
     if (data["bug_feature"]) {
         bug_feature = data["bug_feature"];
         console.log("Got bug_feature from server: " + bug_feature);
@@ -291,6 +286,7 @@ function doDrawing() {
 function draw(img, x, y, width = BLOCK_SIZE, height = BLOCK_SIZE) {
     ctx.drawImage(img, x, y, width, height);
 }
+
 //function to update score
 function updateScore() {
     score+=50;
@@ -379,7 +375,25 @@ function move() {
         x[z] = x[(z - 1)];
         y[z] = y[(z - 1)];
     }
-    //move the food_list
+    if (leftDirection) {
+        x[0] -= BLOCK_SIZE;
+        updateSpeed(x)
+    }
+    if (rightDirection) {
+        x[0] += BLOCK_SIZE;
+        console.log(x)
+        updateSpeed(x)
+        console.log(x)
+    }
+    if (upDirection) {
+        y[0] -= BLOCK_SIZE;
+        updateSpeed(y)
+    }
+    if (downDirection) {
+        y[0] += BLOCK_SIZE;
+        updateSpeed(y)
+    }
+    //move the foods
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i]
         if (food[2] == 0) {
@@ -392,18 +406,18 @@ function move() {
             food_list[i][1] += FOOD_SPEED;
         }
     }
-    if (leftDirection) {
-        x[0] -= SNAKE_SPEED;
-    }
-    if (rightDirection) {
-        x[0] += SNAKE_SPEED;
-    }
-    if (upDirection) {
-        y[0] -= SNAKE_SPEED;
-    }
-    if (downDirection) {
-        y[0] += SNAKE_SPEED;
-    }
+}
+
+//update snake speed
+function updateSpeed(list) {
+    for (var z = snake_size; z >= 0; z--) {
+        if (leftDirection || upDirection) {
+            list[z] += SNAKE_SPEED;
+        }
+        if (rightDirection || downDirection) {
+            list[z] -= SNAKE_SPEED;
+        }
+    };
 }
 
 // check if the snake head hits the wall
