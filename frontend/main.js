@@ -33,6 +33,41 @@ const FOOD_SPEED = 4;
 var x = new Array(MAX_LENGTH);
 var y = new Array(MAX_LENGTH);
 
+// background music
+var music_bg = new Audio('audio/background_music.wav')
+music_bg.loop = true
+music_bg.volume = 0.4
+// sounds
+var sounds = {
+    eat_sfx: {
+        audio: new Audio('audio/apple_bite.ogg'),
+        isplaying: false,
+    },
+    death_sfx: {
+        audio: new Audio('audio/death.ogg'),
+        isplaying: false,
+    },
+    integer_overflow_sfx: {
+        audio: new Audio('audio/magnet_action.wav'),
+        isplaying: false,
+    }
+}
+
+sounds.eat_sfx.audio.addEventListener("ended", function(){
+    sounds.eat_sfx.audio.currentTime = 0;
+    sounds.eat_sfx.isplaying = false
+})
+
+sounds.death_sfx.audio.addEventListener("ended", function(){
+    sounds.death_sfx.audio.currentTime = 0;
+    sounds.death_sfx.isplaying = false
+})
+
+sounds.integer_overflow_sfx.audio.addEventListener("ended", function(){
+    sounds.integer_overflow_sfx.audio.currentTime = 0;
+    sounds.integer_overflow_sfx.isplaying = false
+})
+
 //connect to the server
 let socket = new WebSocket("ws://localhost:8000/ws");
 
@@ -286,6 +321,8 @@ function checkSnakeHealth() {
 }
 
 function gameOver() {
+    music_bg.pause()
+    play_sound(sounds.death_sfx)
     clearInterval(scoreIntervalId);
     clearInterval(reduceIntervalId);
     send_sever(socket, {'Game_Over': true});
@@ -442,8 +479,22 @@ function checkFoodSnakeCollision() {
             }
             food_list.splice(i, 1);
             send_sever(socket, { "food_eaten": i });//sending the food index to the server
+            play_sound(sounds.eat_sfx)
         }
     }
+}
+
+function play_sound(sound){
+    if (sound.isplaying){
+        sound.audio.pause
+        sound.audio.currentTime = 0;
+    }
+    sound.isplaying = true
+    sound.audio.play()
+}
+
+function play_music_bg(){
+    music_bg.play()
 }
 
 //fuction to check if a rectangle intersects another rectangle
