@@ -168,6 +168,7 @@ onkeydown = function (e) {
 };
 
 function loadImages() {
+    //0=up, 1=down, 2=left, 3=right
     head = new Image();
     head.src = 'images/head.png';
     body = new Image();
@@ -202,10 +203,7 @@ function doDrawing() {
 
         if ((z == 0) && !(bug_feature)) {
             //head
-            // drawImage(image, x, y, width, height)
             draw(head, x[z], y[z])
-            ctx.strokeStyle = 'red';
-            // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         } else if ((z == snake_size-1) && !(bug_feature)) {
             //tail
             //draw(tail, x[z], y[z])
@@ -217,16 +215,12 @@ function doDrawing() {
             ctx.fillStyle = 'blue';
             ctx.fillRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
         } else if ((z == snake_size-1) && bug_feature) {
-            //tail if bug_feature is true
-           // drawImage(image, x, y, width, height)
-           draw(head, x[z], y[z])
-           ctx.strokeStyle = 'red';
-           // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+            //head if bug_feature is true
+            draw(head, x[z], y[z])
         } else {
             //body
             draw(body, x[z], y[z])
-            ctx.strokeStyle = 'blue';
-            // ctx.strokeRect(x[z], y[z], BLOCK_SIZE, BLOCK_SIZE);
+
         }
     }
     //draw the food_list

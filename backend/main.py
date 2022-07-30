@@ -123,7 +123,7 @@ def create_food(score: int) -> List[int]:
     food_x = r - BLOCK_SIZE
     r = math.floor(ran.random() * CANVAS_HEIGHT)
     food_y = r - BLOCK_SIZE
-    food_direction = math.floor(ran.random() * 4)  # up, down, left, right
+    food_direction = math.floor(ran.random() * 4)  # 0=up, 1=down, 2=left, 3=right
     # current foods 0 = reduce difficulty, 1 = +4hp, 2 = normal
     # todo add more food types and make the logic better to make the game more fun
     if score > 2000:
