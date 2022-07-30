@@ -68,7 +68,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
             if "save" in receive_data:
                 score_data = receive_data["save"]
-                save_score(score_data, leaderboard)
+                leaderboard = save_score(score_data, leaderboard)
                 await send_leaderboard(websocket, leaderboard)
                 print("leaderboard: ", leaderboard)
                 await websocket.close()
@@ -137,35 +137,53 @@ def food_list() -> List[List[int]]:
     return food_list
 
 
-def save_score(data: dict, list: List) -> None:
+def save_score(data: dict, list: List) -> List[tuple]:
     """Save the score for a user into leaderboard.
 
     Leaderboard is sorted by score in descending order.
     """
-    # convert dict to tuple of its values
-    entry = tuple(data.values())
-    list.append(entry)
-    list.sort(key=lambda x: x[1], reverse=True)
-    save_score_to_file(list)
+    # check if the user is already in the leaderboard
+    if data["user"] in [row[0] for row in list]:
+        # if so, update the score of the user
+        for row in list:
+            if row[0] == data["user"]:
+                # check if the score is higher than the previous one
+                if data["score"] > row[1]:
+                    entry = tuple(data.values())
+                    list.remove(row)
+                    break
+                    # todo send the client a message that the score was higher
+                # if not, discard the score
+                else:
+                    # todo send the client a message that the score was lower
+                    entry = None
+    # if not, add the user to the leaderboard
+    else:
+        # convert dict to tuple of its values
+        entry = tuple(data.values())
+
+    # check if the entry is not None//if the score is lower than the previous one
+    if entry:
+        list.append(entry)
+        # sort by score in descending order
+        list.sort(key=lambda x: x[1], reverse=True)
+        save_score_to_file(list)
+    return list
 
 
 def save_score_to_file(data: list) -> None:
-    """Save the score for a user into leaderboard.json.
-
-    Leaderboard is sorted by score in descending order.
-    """
+    """Save the leaderboard into leaderboard.json."""
     # convert list of tuples to list of dicts
     data = [dict(zip(data[0], row)) for row in data]
     # create dict to load file values
-    leaderboard_ng = dict()
-    # load and append to dict, clear file and dump
+    file_data = dict()
     with open('leaderboard.json', 'r+') as f:
-        leaderboard_ng = json.load(f)
+        file_data = json.load(f)
         f.seek(0)
         # append new data and delete old data
-        leaderboard_ng.update({"user_scores": data})
+        file_data.update({"user_scores": data})
         f.truncate(0)
-        json.dump(leaderboard_ng, f, indent=4)
+        json.dump(file_data, f, indent=4)
         f.close()
 
 

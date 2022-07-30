@@ -1,20 +1,16 @@
 {
     "user_scores": [
         {
-            "user": "mynasmeasasdd",
-            "score": 21150
+            "hahaha": "high",
+            "20600": 20600
         },
         {
-            "user": "hahaha",
-            "score": 20600
+            "hahaha": "mid",
+            "20600": 14150
         },
         {
-            "user": "asdasd",
-            "score": 18150
-        },
-        {
-            "user": "thisisme",
-            "score": 20600
+            "hahaha": "low",
+            "20600": 2600
         }
     ]
 }
