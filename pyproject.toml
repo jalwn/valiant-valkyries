@@ -24,7 +24,7 @@ flake8-docstrings = "~=1.6.0"
 flake8-isort = "~=4.1.2.post0"
 
 [tool.poetry.scripts]
-api = "backend.main:start"
+game = "backend.main:start"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
