@@ -133,22 +133,25 @@ def food_type(score: int) -> int:
     """
     FoodType = namedtuple("FoodType", ["min_score", "rarity", "food_type"])
     hp1_food = FoodType(0, 0, 3)
-    hp4_food = FoodType(3000, 50, 1)
-    feature_food = FoodType(6000, 75, 2)
-    time_food = FoodType(9000, 90, 0)
+    hp4_food = FoodType(3000, .50, 1)
+    feature_food = FoodType(6000, .75, 2)
+    time_food = FoodType(9000, .90, 0)
 
+    food = 3
     ran = random.SystemRandom()
     if score >= time_food.min_score:
         if ran.random() > time_food.rarity:
-            return time_food.food_type
+            food = time_food.food_type
     elif score >= feature_food.min_score:
         if ran.random() > feature_food.rarity:
-            return feature_food.food_type
+            food = feature_food.food_type
     elif score >= hp4_food.min_score:
         if ran.random() > hp4_food.rarity:
-            return hp4_food.food_type
+            food = hp4_food.food_type
     else:
-        return hp1_food.food_type
+        food = hp1_food.food_type
+
+    return food
 
 
 def food_list() -> List[List[int]]:
