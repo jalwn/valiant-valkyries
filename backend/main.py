@@ -12,13 +12,17 @@ from fastapi.staticfiles import StaticFiles
 BLOCK_SIZE = 20
 CANVAS_HEIGHT = 500
 CANVAS_WIDTH = 500
-app = FastAPI()
-init_snake_size = 3
-init_difficulty = 3*1000  # time in milliseconds
-leaderboard = []
-# leaderboard will be sorted by this key
 LEADERBOARD_SORT_BY = "score"
 BACKEND = os.path.join(os.getcwd(), "frontend")
+app = FastAPI()
+
+snake_position: List[int]
+score: int
+snake_size: int
+difficulty: int
+tigger_bug: bool
+leaderboard: List[Tuple]
+food_list: List[List[int]]
 
 
 @app.websocket_route("/ws")
@@ -32,18 +36,15 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     await websocket.accept()
     snake_position = []
     score = 0
-    snake_size = init_snake_size
-    difficulty = init_difficulty
-    bug_feature = False
+    snake_size = 3
+    difficulty = 3*1000  # time in milliseconds
+    trigger_bug = False
     leaderboard = load_leaderboard()
     foods_list = food_list()
     await send_food_list(websocket, foods_list)
     try:
         while True:
-
-            # Recive data from client
             receive_data = await websocket.receive_json()
-            # print(receive_data)
 
             if "info" in receive_data:
                 snake_position = receive_data["info"]["snake_pos"]
@@ -61,9 +62,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                     snake_size += 4
                 elif food_eaten[3] == 2:
                     # add a bug feature
-                    bug_feature = not bug_feature
-                    print(bug_feature)
-                    await send_bug_feature(websocket, bug_feature)
+                    trigger_bug = not trigger_bug
+                    await send_trigger_bug(websocket, trigger_bug)
                 else:
                     # normal food
                     snake_size += 1
@@ -107,12 +107,11 @@ async def update_difficulty(socket: WebSocket, difficulty: int) -> None:
     await socket.send_json({"difficulty": difficulty})
 
 
-async def send_bug_feature(socket: WebSocket, bug_feature: bool) -> None:
+async def send_trigger_bug(socket: WebSocket, trigger_bug: bool) -> None:
     """Send bug/feature state to data to client."""
-    await socket.send_json({"bug_feature": bug_feature})
+    await socket.send_json({"bug_feature": trigger_bug})
 
 
-# send alert to client
 async def send_alert(socket: WebSocket, alert: str) -> None:
     """Send alert to client."""
     await socket.send_json({"alert": alert})
