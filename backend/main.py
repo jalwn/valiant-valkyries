@@ -40,7 +40,6 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     snake_size = init_snake_size
     difficulty = init_difficulty
     leaderboard = load_leaderboard()
-    # Send food list to client
     foods_list = food_list()
     await send_food_list(websocket, foods_list)
     try:
@@ -81,9 +80,6 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             if "Game_Over" in receive_data:
                 await send_leaderboard(websocket, leaderboard)
                 print("Gameover: ", receive_data["Game_Over"])
-                snake_position = []
-                score = 0
-                snake_size = 3
 
     except Exception as e:
         if (e == WebSocketDisconnect):
