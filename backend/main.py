@@ -2,6 +2,7 @@ import json
 import math
 import os
 import random
+from collections import namedtuple
 from typing import List, Tuple
 
 import uvicorn
@@ -123,16 +124,35 @@ def create_food(score: int) -> List[int]:
     food_x = r - BLOCK_SIZE
     r = math.floor(ran.random() * CANVAS_HEIGHT)
     food_y = r - BLOCK_SIZE
-    food_direction = math.floor(ran.random() * 4)  # 0=up, 1=down, 2=left, 3=right
-    # current foods 0 = reduce difficulty, 1 = +4hp, 2 = normal
-    # todo add more food types and make the logic better to make the game more fun
-    if score > 2000:
-        food_type = math.floor(ran.random() * 2)  # 0, 1
-    elif score > 10000:
-        food_type = 2
+    food_direction = math.floor(ran.random() * 4)  # up, down, left, right
+    foodtype = food_type(score)
+    return [food_x, food_y, food_direction, foodtype]
+
+
+def food_type(score: int) -> int:
+    """
+    Return food type depending on score and rarity.
+
+    Food type is either 0, 1, 2 or 3.
+    """
+    FoodType = namedtuple("FoodType", ["min_score", "rarity", "food_type"])
+    hp1_food = FoodType(0, 0, 3)
+    hp4_food = FoodType(3000, 50, 1)
+    feature_food = FoodType(6000, 75, 2)
+    time_food = FoodType(9000, 90, 0)
+
+    ran = random.SystemRandom()
+    if score >= time_food.min_score:
+        if ran.random() > time_food.rarity:
+            return time_food.food_type
+    elif score >= feature_food.min_score:
+        if ran.random() > feature_food.rarity:
+            return feature_food.food_type
+    elif score >= hp4_food.min_score:
+        if ran.random() > hp4_food.rarity:
+            return hp4_food.food_type
     else:
-        food_type = 3
-    return [food_x, food_y, food_direction, food_type]
+        return hp1_food.food_type
 
 
 def food_list() -> List[List[int]]:
