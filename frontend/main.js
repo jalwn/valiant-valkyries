@@ -45,7 +45,7 @@ var sounds = {
         audio: new Audio('audio/vgdeathsound.ogg'),
         isplaying: false,
     },
-    integer_overflow: {
+    integer_overflow_sfx: {
         audio: new Audio('audio/magnet_action.wav'),
         isplaying: false,
     }
@@ -59,6 +59,11 @@ sounds.eat_sfx.audio.addEventListener("ended", function(){
 sounds.death_sfx.audio.addEventListener("ended", function(){
     sounds.death_sfx.audio.currentTime = 0;
     sounds.death_sfx.isplaying = false
+})
+
+sounds.integer_overflow_sfx.audio.addEventListener("ended", function(){
+    sounds.integer_overflow_sfx.audio.currentTime = 0;
+    sounds.integer_overflow_sfx.isplaying = false
 })
 
 //connect to the server
