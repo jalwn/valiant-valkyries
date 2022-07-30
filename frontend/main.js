@@ -81,6 +81,11 @@ function send_sever(socket, data) {
     }
 }
 
+function updateSnakeReduceInterval(){
+    clearInterval(reduceIntervalId);
+    reduceIntervalId = setInterval(reduceSnake, difficulty);
+}
+
 //receive data from server
 socket.onmessage = function (event) {
     var data = JSON.parse(event.data);
@@ -100,6 +105,12 @@ socket.onmessage = function (event) {
         leaderboard = data["leaderboard"];
         console.log("Got leaderboard from server " + leaderboard);
         populate_leaderboard_table();
+    }
+    //getting difficulty update data from server
+    if (data["difficulty"]){
+        difficulty = data["difficulty"];
+        console.log("Increasing snake reduce interval to: " + difficulty);
+        updateSnakeReduceInterval();
     }
 };
 
@@ -187,7 +198,7 @@ function doDrawing() {
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
         if (food[3]  == 0) {
-            //reduce difficulty food
+            //reduce gameplay difficulty food
             ctx.fillStyle = 'red';
             ctx.fillRect(food[0], food[1], BLOCK_SIZE, BLOCK_SIZE);
         } else if(food[3] == 1) {
@@ -216,9 +227,11 @@ function updateScore() {
 
 //function to reduce the snake size
 function reduceSnake() {
+    //console.timeEnd("reduceSnake");
     snake_size--;
     x.pop();
     y.pop();
+    //console.time("reduceSnake");
 }
 
 //function to check if the snake health is 0
@@ -361,12 +374,11 @@ function checkFoodSnakeCollision() {
             //do thing depending on the food type
             console.log("food eaten:"+food_list[i][3]);
             if (food_list[i][3] == 0) {
-                // todo reduce difficulty
-                console.log("reduce difficulty");
+                // Difficulty reducing is done in onmessage event
             } else if (food_list[i][3] == 1) {
                 snake_size+=4;
             } else {
-                snake_size++;
+                snake_size+=1;
             }
             food_list.splice(i, 1);
             send_sever(socket, { "food_eaten": i });//sending the food index to the server

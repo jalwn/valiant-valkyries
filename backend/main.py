@@ -53,9 +53,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             if "food_eaten" in receive_data:
                 food_eaten = foods_list[receive_data["food_eaten"]]
                 if food_eaten[3] == 0:
-                    # reduce difficulty
-                    difficulty = difficulty - 1000
-                    # todo send difficulty to client
+                    # reduce gameplay difficulty
+                    difficulty += 2000
+                    await update_difficulty(websocket, difficulty)
                 elif food_eaten[3] == 1:
                     # increase snake size
                     snake_size += 4
@@ -100,6 +100,11 @@ async def send_single_food(socket: WebSocket, food: List[int]) -> None:
 async def send_leaderboard(socket: WebSocket, leaderboard: List[Tuple]) -> None:
     """Send leaderboard data to client."""
     await socket.send_json({"leaderboard": leaderboard})
+
+
+async def update_difficulty(socket: WebSocket, difficulty: int) -> None:
+    """Send difficulty update data to client."""
+    await socket.send_json({"difficulty": difficulty})
 
 
 def create_food(score: int) -> List[int]:
