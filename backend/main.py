@@ -173,7 +173,7 @@ def save_score(data: dict, list: List) -> List[tuple]:
         entry = tuple(data.values())
 
     # check if the entry is not None//if the score is lower than the previous one
-    if entry:
+    if entry is not None:
         list.append(entry)
         # sort by score in descending order
         list.sort(key=lambda x: x[1], reverse=True)
