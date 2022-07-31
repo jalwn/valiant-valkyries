@@ -78,15 +78,13 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             if "info" in receive_data:
                 snake_position = receive_data["info"]["snake_pos"]
                 score = receive_data["info"]["score"]
-
-                # increase difficulty based on score
-                if score >= 60000 and score % 15000 == 0 and difficulty > 1000:
-                    difficulty -= 1000
+                # decrease difficulty every 2s until it reaches 600ms
+                if difficulty > 600 and score % 2e3 == 0:
+                    if score > 40e3:
+                        difficulty -= 400
+                    elif score > 20e3 and snake_size > 8:
+                        difficulty -= 200
                     await update_difficulty(websocket, difficulty)
-                elif score % 15000 == 0 and difficulty > 2000:
-                    difficulty -= 1000
-                    await update_difficulty(websocket, difficulty)
-
                 print("Snake position: ", snake_position, "| Score: ", score)
 
             if "food_eaten" in receive_data:
