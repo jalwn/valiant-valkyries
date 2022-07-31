@@ -57,14 +57,6 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                     difficulty -= 1000
                     await update_difficulty(websocket, difficulty)
 
-                # trigger feature/bug every 90 seconds and stop it after 15 seconds
-                if score % 15000 == 0 and trigger_bug is True:
-                    trigger_bug = False
-                    await send_trigger_bug(websocket, trigger_bug)
-                elif score % 90000 == 0 and trigger_bug is False:
-                    trigger_bug = True
-                    await send_trigger_bug(websocket, trigger_bug)
-
                 print("Snake position: ", snake_position, "| Score: ", score)
 
             if "food_eaten" in receive_data:
@@ -154,14 +146,14 @@ def get_food_type(score: int) -> int:
     FoodType = namedtuple("FoodType", ["name", "min_score", "weight", "food_type"])
     # score = seconds survived * 1000 = milliseconds survived
     # Xe3 means X * 1000, i.e., X is the seconds survived
+    time_food = FoodType("time_food", 45e3, 10, 0)
+    hpX_food = FoodType("hpX_food", 20e3, 50, 1)
+    feature_food = FoodType("feature_food", 30e3, 10, 2)
     hp1_food = FoodType("hp1_food", 0, 100, 3)
-    hp4_food = FoodType("hp4_food", 30e3, 50, 1)
-    feature_food = FoodType("feature_food", 40e3, 10, 2)
-    time_food = FoodType("time_food", 90e3, 10, 0)
 
     food = hp1_food
 
-    all_foods = [hp1_food, hp4_food, feature_food, time_food]
+    all_foods = [hp1_food, hpX_food, feature_food, time_food]
     valid_foods = [hp1_food]
 
     # add valid foods to the list

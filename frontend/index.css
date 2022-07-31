@@ -41,3 +41,8 @@ kbd {
     color: #333333 !important;
     background-color: #eeeeee !important;
 }
+
+.poison {
+    color: #8c51c6;
+    font-weight: bold;
+}

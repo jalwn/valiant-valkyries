@@ -86,7 +86,7 @@ async function init() {
     loadImages();
     createSnake();
     setTimeout("gameCycle()", DELAY);
-    scoreIntervalId = setInterval(updateScore, 10);
+    scoreIntervalId = setInterval(updateScore, 100);
     reduceIntervalId = setInterval(reduceSnake, difficulty);
     //check if user existed
     if (getCookie("user")) {
@@ -337,13 +337,28 @@ function draw(img, x, y, scale = 1.0, aspect = [1,1], width = BLOCK_SIZE, height
 
 //function to update score
 function updateScore() {
-    score+=50;
-    var score_text = String(score/10);
-    while (score_text.length < 6) {
-        score_text = "0" + score_text;
-    }
-    score_text = score_text.slice(0, 2) + ":" + score_text.slice(2, 4) + "." + score_text.slice(4, 6);
-    document.getElementById("score").innerHTML = score_text;
+    // score is in milliseconds
+    // this function is run every 100ms so add 100 to score
+    score += 100;
+
+    // extract milliseconds, seconds, minutes as floats
+    let f_milliseconds = score;
+    let f_seconds = f_milliseconds / 1000;
+    let f_minutes = f_seconds / 60;
+
+    // round down all units and find moduli
+    let minutes = Math.floor(f_minutes);
+    // extra seconds (>0, <60)
+    let seconds = Math.floor(f_seconds - minutes * 60);
+    // extra milliseconds (>0, <1000) no need for Math.floor()
+    let milliseconds = f_milliseconds - minutes * 60 * 1000 - seconds * 1000;
+
+    let minutes_text = (minutes < 10) ? "0" + String(minutes) : String(minutes);
+    let seconds_text = (seconds < 10) ? "0" + String(seconds) : String(seconds);
+    let milliseconds_text = String(milliseconds)[0];
+
+    score_text = minutes_text + ":" + seconds_text + "." + milliseconds_text;
+    document.getElementById("score").textContent = score_text;
 }
 
 //function to reduce the snake size
