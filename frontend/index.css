@@ -4,7 +4,9 @@
 }
 
 canvas {
-    background: #00A619;
+    /* doesnt work */
+    background-image: url(./images/background.png);
+    /* dont add a background color bcz it overrides canvas background */
 }
 
 .hide {
