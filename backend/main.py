@@ -49,6 +49,23 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             if "info" in receive_data:
                 snake_position = receive_data["info"]["snake_pos"]
                 score = receive_data["info"]["score"]
+
+                # increase difficulty based on score
+                if score >= 60000 and score % 15000 == 0 and difficulty > 1000:
+                    difficulty -= 1000
+                    await update_difficulty(websocket, difficulty)
+                elif score % 15000 == 0 and difficulty > 2000:
+                    difficulty -= 1000
+                    await update_difficulty(websocket, difficulty)
+
+                # trigger feature/bug every 90 seconds and stop it after 15 seconds
+                if score % 15000 == 0 and trigger_bug is True:
+                    trigger_bug = False
+                    await send_trigger_bug(websocket, trigger_bug)
+                elif score % 90000 == 0 and trigger_bug is False:
+                    trigger_bug = True
+                    await send_trigger_bug(websocket, trigger_bug)
+
                 print("Snake position: ", snake_position, "| Score: ", score)
 
             if "food_eaten" in receive_data:
@@ -75,6 +92,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 leaderboard = await save_score(websocket, receive_data["save"], leaderboard)
                 print("leaderboard: ", leaderboard)
                 await websocket.close()
+
+            if "snake_size" in receive_data:
+                snake_size = receive_data["snake_size"]
 
             if "Game_Over" in receive_data:
                 await send_leaderboard(websocket, leaderboard)
