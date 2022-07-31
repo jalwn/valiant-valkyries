@@ -94,12 +94,6 @@ function gameCycle() {
     //console.timeEnd("gameCycle");
     if (inGame) {
         //console.time("gameCycle");
-        doDrawing();
-        checkSnakeHealth();
-        checkSnakeCollision();
-        checkFoodCollision();
-        checkFoodSnakeCollision();
-        move();
         info = {
             "info": {
                 "snake_pos": [x[0], y[0]],
@@ -107,6 +101,12 @@ function gameCycle() {
             },
         };
         send_sever(socket, info);
+        doDrawing();
+        checkSnakeHealth();
+        checkSnakeCollision();
+        checkFoodCollision();
+        checkFoodSnakeCollision();
+        move();
         setTimeout("gameCycle()", DELAY);
     }
 }
