@@ -80,6 +80,7 @@ async function init() {
         ctx.drawImage(background, 0, 0);
     }
     await displayInstructions();
+    play_music_bg();
     // hide cursor
     document.body.style.cursor = "none";
     loadImages();
@@ -577,9 +578,9 @@ function checkCookie(cname) {
 function displayInstructions() {
     return new Promise((resolve, reject) => {
         // console.log("display instructions...");
-        const instructions_el = document.getElementById("instructions");
+        const instructions_el = document.getElementById("instructions-modal");
         const instructions_modal = new bootstrap.Modal(instructions_el, {
-            keyboard: true,
+            keyboard: false,  // user must acknowledge instructions
             focus: true
         });
         instructions_modal.show();
