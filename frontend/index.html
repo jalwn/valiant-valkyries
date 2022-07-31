@@ -16,29 +16,38 @@
         <!-- Load Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
-
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Open+Sans&family=Varela+Round&display=swap"
+            rel="stylesheet">
         <link href="index.css" rel="stylesheet" type="text/css">
         <script src="main.js"></script>
     </head>
 
     <body onload="init();">
-        <div class="modal fade" id="instructions" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
+        <div class="modal fade" id="instructions-modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content" id="instructions">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="instructionsLabel">Before Playing</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title" id="instructions-label">Before Playing</h5>
                     </div>
                     <div class="modal-body">
+                        <p class="instructions text-center">Welcome to <span class="game-name">Bugland</span>. Try your best to
+                            survive and have fun!</p>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Use the arrow keys to move the snake.</li>
+                            <li class="list-group-item">The poison of this land causes you to starve.</li>
+                            <li class="list-group-item">To stay alive, you must keep feeding.</li>
+                            <li class="list-group-item">Use the <kbd>← ↑ ↓ →</kbd> (arrow keys) or <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> keys to move around.</li>
+                            <li class="list-group-item">Stay away from the poison wall.</li>
+                            <li class="list-group-item">Different foods will give you different effects. (not all of them are desirable)</li>
+                            <li class="list-group-item">The "yellow bug" <img src="images/yellow-bug/0.png" height="16"> regenerates one segment of your body.</li>
+                            <li class="list-group-item">The "red bug" <img src="images/red-bug/0.png" height="16"> regenerates more than one segments of your body.</li>
+                            <li class="list-group-item">The "caterpillar" <img src="images/caterpillar/0.png" height="16"> lends immunity from the poison.</li>
+                            <li class="list-group-item">The "butterfly" <img src="images/butterfly/0.png" height="16"> has an unusual effect of increasing your length. It is the only creature known to be able surpass the poison wall entirely.</li>
                         </ul>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn mx-auto btn-outline-primary"
-                            data-bs-dismiss="modal" onclick="play_music_bg()">Start</button>
+                        <button type="button" class="btn mx-auto btn-outline-primary" data-bs-dismiss="modal"
+                            onclick="play_music_bg()">Start</button>
                     </div>
                 </div>
             </div>
@@ -82,4 +91,5 @@
             </div>
         </main>
     </body>
+
 </html>

@@ -24,3 +24,18 @@ canvas {
     width: 80%;
     font-size: 1.35em;
 }
+
+.instructions {
+    font-size: 1em;
+    /* width: auto; */
+}
+
+.game-name {
+    font-family: 'Bubblegum Sans', 'Calibri Light', cursive;
+    font-size: 1.1em;
+}
+
+kbd {
+    color: #333333 !important;
+    background-color: #eeeeee !important;
+}
