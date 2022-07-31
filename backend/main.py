@@ -91,7 +91,6 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             if "save" in receive_data:
                 leaderboard = await save_score(websocket, receive_data["save"], leaderboard)
                 print("leaderboard: ", leaderboard)
-                await websocket.close()
 
             if "snake_size" in receive_data:
                 snake_size = receive_data["snake_size"]
@@ -100,11 +99,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 await send_leaderboard(websocket, leaderboard)
                 print("Gameover: ", receive_data["Game_Over"])
 
-    except Exception as e:
-        if (e == WebSocketDisconnect):
-            print("Connection closed by client")
-        else:
-            print("Error: ", e)
+    except WebSocketDisconnect:
+        print("Connection closed by client")
 
 
 async def send_food_list(socket: WebSocket, food_list: List[List[int]]) -> None:
@@ -210,16 +206,17 @@ async def save_score(websocket: WebSocket, data: dict, list: List) -> List[tuple
                 if data["score"] > row[1]:
                     entry = tuple(data.values())
                     list.remove(row)
-                    await send_alert(websocket, "Great you set a new higher score!")
+                    alert = "Congrats, you set a new Higher Score!"
                     break
                 # if not, discard the score
                 else:
-                    await send_alert(websocket, "Sorry! Your score was lower than the previous one :<")
+                    alert = "Sorry! Your score was lower than the previous one :<"
                     entry = None
     # if not, add the user to the leaderboard
     else:
         # convert dict to tuple of its values
         entry = tuple(data.values())
+        alert = "Congrats! You made it to the leaderboard!"
 
     # check if the entry is not None//if the score is lower than the previous one
     if entry is not None:
@@ -229,6 +226,7 @@ async def save_score(websocket: WebSocket, data: dict, list: List) -> List[tuple
         save_score_to_file(list)
 
     await send_leaderboard(websocket, list)
+    await send_alert(websocket, alert)
     return list
 
 
