@@ -273,7 +273,7 @@ function createSnake() {
         x[z] = 250 - z * BLOCK_SIZE + BLOCK_SIZE / 2;
         y[z] = 50 + BLOCK_SIZE / 2;
     }
-    console.log(`Snake X: ${x}\nSnake Y: ${y}`);
+    //console.log(`Snake X: ${x}\nSnake Y: ${y}`);
 }
 
 //draw the game
