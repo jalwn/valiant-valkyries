@@ -1,5 +1,4 @@
 import json
-import math
 import os
 import random
 from collections import namedtuple
@@ -143,43 +142,41 @@ def create_food(score: int) -> List[int]:
 
     List of the form [postion_x, position_y, direction, food_type].
     """
-    ran = random.SystemRandom()
-    r = math.floor(ran.random() * CANVAS_WIDTH)
-    food_x = r - BLOCK_SIZE
-    r = math.floor(ran.random() * CANVAS_HEIGHT)
-    food_y = r - BLOCK_SIZE
-    food_direction = math.floor(ran.random() * 4)  # up, down, left, right
-    foodtype = food_type(score)
+    food_x = random.randint(0, CANVAS_WIDTH - BLOCK_SIZE)  # noqa: S311
+    food_y = random.randint(0, CANVAS_HEIGHT - BLOCK_SIZE)  # noqa: S311
+    food_direction = random.randint(0, 3)  # up, down, left, right  # noqa: S311
+    foodtype = get_food_type(score)
     return [food_x, food_y, food_direction, foodtype]
 
 
-def food_type(score: int) -> int:
+def get_food_type(score: int) -> int:
     """
     Return food type depending on score and rarity.
 
     Food type is either 0, 1, 2 or 3.
     """
-    FoodType = namedtuple("FoodType", ["min_score", "rarity", "food_type"])
-    hp1_food = FoodType(0, 0, 3)
-    hp4_food = FoodType(3000, .50, 1)
-    feature_food = FoodType(6000, .75, 2)
-    time_food = FoodType(9000, .90, 0)
+    FoodType = namedtuple("FoodType", ["name", "min_score", "weight", "food_type"])
+    # score = seconds survived * 1000 = milliseconds survived
+    # Xe3 means X * 1000, i.e., X is the seconds survived
+    hp1_food = FoodType("hp1_food", 0, 100, 3)
+    hp4_food = FoodType("hp4_food", 30e3, 50, 1)
+    feature_food = FoodType("feature_food", 40e3, 10, 2)
+    time_food = FoodType("time_food", 90e3, 10, 0)
 
-    food = 3
-    ran = random.SystemRandom()
-    if score >= time_food.min_score:
-        if ran.random() > time_food.rarity:
-            food = time_food.food_type
-    elif score >= feature_food.min_score:
-        if ran.random() > feature_food.rarity:
-            food = feature_food.food_type
-    elif score >= hp4_food.min_score:
-        if ran.random() > hp4_food.rarity:
-            food = hp4_food.food_type
-    else:
-        food = hp1_food.food_type
+    food = hp1_food
 
-    return food
+    all_foods = [hp1_food, hp4_food, feature_food, time_food]
+    valid_foods = [hp1_food]
+
+    # add valid foods to the list
+    for food in all_foods:
+        if food.min_score <= score:
+            valid_foods.append(food)
+
+    # get a random food from the list based on weight
+    food = random.choices(valid_foods, weights=[f.weight for f in valid_foods], k=1)[0]  # noqa: S311
+
+    return food.food_type
 
 
 def food_list() -> List[List[int]]:
@@ -192,7 +189,6 @@ def food_list() -> List[List[int]]:
     for _ in range(5):
         food = create_food(0)
         food_list.append(food)
-    # print(food_list)
     return food_list
 
 
