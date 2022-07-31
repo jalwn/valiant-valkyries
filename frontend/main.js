@@ -50,6 +50,10 @@ var sounds = {
     integer_overflow_sfx: {
         audio: new Audio('audio/magnet_action.wav'),
         isplaying: false,
+    },
+    crunch_sfx: {
+        audio: new Audio('audio/crunch.mp3'),
+        isplaying: false,
     }
 }
 
@@ -66,6 +70,11 @@ sounds.death_sfx.audio.addEventListener("ended", function(){
 sounds.integer_overflow_sfx.audio.addEventListener("ended", function(){
     sounds.integer_overflow_sfx.audio.currentTime = 0;
     sounds.integer_overflow_sfx.isplaying = false
+})
+
+sounds.crunch_sfx.audio.addEventListener("ended", function(){
+    sounds.crunch_sfx.audio.currentTime = 0;
+    sounds.crunch_sfx.isplaying = false
 })
 
 //connect to the server
@@ -529,17 +538,20 @@ function checkFoodSnakeCollision() {
             //do thing depending on the food type
             //console.log("food eaten:"+food_list[i][3]);
             if (food_list[i][3] == 0) {
+                play_sound(sounds.eat_sfx)
                 // Difficulty reducing is done in onmessage event
             } else if (food_list[i][3] == 1) {
                 snake_size+=4;
+                play_sound(sounds.eat_sfx)
             } else if (food_list[i][3] == 2) {
+                play_sound(sounds.integer_overflow_sfx)
                 // changing bugfeature is done in onmessage event
             } else if (food_list[i][3] == 3){
                 snake_size+=1;
+                play_sound(sounds.crunch_sfx)
             }
             food_list.splice(i, 1);
             send_sever(socket, { "food_eaten": i });//sending the food index to the server
-            play_sound(sounds.eat_sfx)
         }
     }
 }
