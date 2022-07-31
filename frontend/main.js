@@ -151,6 +151,7 @@ socket.onmessage = function (event) {
     if (data["alert"]) {
         alert(data["alert"]);
         console.log("Got alert from server: " + data["alert"]);
+        socket.close();
     }
 };
 
