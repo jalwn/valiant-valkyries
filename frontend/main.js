@@ -74,6 +74,11 @@ let socket = new WebSocket("ws://localhost:8000/ws");
 async function init() {
     canvas = document.getElementById('Canvas');
     ctx = canvas.getContext('2d');
+    var background = new Image();
+    background.src = "images/background.png";
+    background.onload = () => {
+        ctx.drawImage(background, 0, 0);
+    }
     await displayInstructions();
     // hide cursor
     document.body.style.cursor = "none";
