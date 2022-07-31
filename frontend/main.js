@@ -228,8 +228,11 @@ function loadImages() {
         return images;
     };
     head = loadImageArray('head');
+    head_inverse = loadImageArray('head-inverse');
     body = loadImageArray('body');
+    body_inverse = loadImageArray('body-inverse');
     tail = loadImageArray('tail');
+    tail_inverse = loadImageArray('tail-inverse');
     bug_1hp = loadImageArray('yellow-bug');
     bug_4hp = loadImageArray('red-bug');
     bug_easy = loadImageArray('caterpillar');
@@ -238,6 +241,7 @@ function loadImages() {
     // TODO: implement directional head, body, tail images
     //head = head[0];
     body = body[0];
+    body_inverse = body_inverse[0];
     //tail = tail[0];
 }
 
@@ -264,10 +268,12 @@ function doDrawing() {
             draw(tail[direction], x[z], y[z])
         } else if ((z == 0) && bug_feature) {
             //head if bug_feature is true
-            draw(tail[direction], x[z], y[z])
+            draw(tail_inverse[direction], x[z], y[z])
         } else if ((z == snake_size-1) && bug_feature) {
             //tail if bug_feature is true
-            draw(head[direction], x[z], y[z])
+            draw(head_inverse[direction], x[z], y[z])
+        } else if (bug_feature) {
+            draw(body_inverse, x[z], y[z])
         } else {
             //body
             draw(body, x[z], y[z])
