@@ -36,3 +36,4 @@ change origin url before pulling bcs I changed the repo name
 4. https://opengameart.org/content/8bit-death-whirl (death sound)
 5. https://freesound.org/people/Slaking_97/sounds/455109/ (background music)
 6. https://opengameart.org/content/atmospheric-interaction-sound-pack (integer overflow from this pack)
+7. https://orangefreesounds.com/potato-chip-crunch-single-bite/ (eat sound)
