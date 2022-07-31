@@ -21,6 +21,7 @@ var rightDirection = true;
 var upDirection = false;
 var downDirection = false;
 var inGame = true;
+var direction = 3;
 
 const BLOCK_SIZE = 20;  //change the block size will also need a change in the images
 const MAX_LENGTH = 100;  //max length of the snake
@@ -182,21 +183,25 @@ onkeydown = function (e) {
         upDirection = true;
         rightDirection = false;
         leftDirection = false;
+        direction = 0;
     }
     if ((downKeys.includes(key)) && (!upDirection)) {       //move down
         downDirection = true;
         rightDirection = false;
         leftDirection = false;
+        direction = 1;
     }
     if ((leftKeys.includes(key)) && (!rightDirection)) {    //move left
         leftDirection = true;
         upDirection = false;
         downDirection = false;
+        direction = 2;
     }
     if ((rightKeys.includes(key)) && (!leftDirection)) {    //move right
         rightDirection = true;
         upDirection = false;
         downDirection = false;
+        direction = 3;
     }
 };
 
@@ -224,9 +229,9 @@ function loadImages() {
     bug_fly = loadImageArray('butterfly');
 
     // TODO: implement directional head, body, tail images
-    head = head[0];
+    //head = head[0];
     body = body[0];
-    tail = tail[0];
+    //tail = tail[0];
 }
 
 //initialize the snake
@@ -246,16 +251,16 @@ function doDrawing() {
     for (var z = snake_size - 1; z >= 0; z--) {
         if ((z == 0) && !(bug_feature)) {
             //head
-            draw(head, x[z], y[z])
+            draw(head[direction], x[z], y[z])
         } else if ((z == snake_size-1) && !(bug_feature)) {
             //tail
-            draw(tail, x[z], y[z])
+            draw(tail[direction], x[z], y[z])
         } else if ((z == 0) && bug_feature) {
             //head if bug_feature is true
-            draw(tail, x[z], y[z])
+            draw(tail[direction], x[z], y[z])
         } else if ((z == snake_size-1) && bug_feature) {
             //tail if bug_feature is true
-            draw(head, x[z], y[z])
+            draw(head[direction], x[z], y[z])
         } else {
             //body
             draw(body, x[z], y[z])
