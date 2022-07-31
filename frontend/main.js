@@ -7,7 +7,8 @@ var food_img;
 var body;
 var snake_size;
 var food;
-var bug_feature= false;
+var bug_feature = false;
+var old_bug_feature = false;
 var leaderboard;
 var username;
 var deathReason;
@@ -29,6 +30,11 @@ const DELAY = 120;
 const CANVAS_HEIGHT = 500;
 const CANVAS_WIDTH = 500;
 const FOOD_SPEED = 6;
+const SCORE_UPDATE_INTERVAL = 100; // in milliseconds
+
+let ERROR_IMAGE = null;
+const ERROR_IMAGE_TIME = 10000;
+let error_image_score = -1;
 
 var x = new Array(MAX_LENGTH);
 var y = new Array(MAX_LENGTH);
@@ -83,6 +89,7 @@ let socket = new WebSocket("ws://localhost:8000/ws");
 async function init() {
     canvas = document.getElementById('Canvas');
     ctx = canvas.getContext('2d');
+    ERROR_IMAGE = document.getElementById("error-image");
     var background = new Image();
     background.src = "images/background.png";
     background.onload = () => {
@@ -95,7 +102,7 @@ async function init() {
     loadImages();
     createSnake();
     setTimeout("gameCycle()", DELAY);
-    scoreIntervalId = setInterval(updateScore, 100);
+    scoreIntervalId = setInterval(updateScore, SCORE_UPDATE_INTERVAL);
     reduceIntervalId = setInterval(reduceSnake, difficulty);
     //check if user existed
     if (getCookie("user")) {
@@ -122,6 +129,9 @@ function gameCycle() {
         checkFoodCollision();
         checkFoodSnakeCollision();
         move();
+        if ((old_bug_feature == false) && (bug_feature == true)) {
+            processBugFeature();
+        }
         setTimeout("gameCycle()", DELAY);
     }
 }
@@ -162,6 +172,8 @@ socket.onmessage = function (event) {
     }
     if (data["bug_feature"]) {
         bug_feature = data["bug_feature"];
+        // set old_bug_feature to bug_feature only if it is false
+        if (!bug_feature) { old_bug_feature = bug_feature }
         console.log("Got bug_feature from server: " + bug_feature);
     }
     if (data["alert"]) {
@@ -347,8 +359,8 @@ function draw(img, x, y, scale = 1.0, aspect = [1,1], width = BLOCK_SIZE, height
 //function to update score
 function updateScore() {
     // score is in milliseconds
-    // this function is run every 100ms so add 100 to score
-    score += 100;
+    // this function is run every SCORE_UPDATE_INTERVAL ms so add it to score
+    score += SCORE_UPDATE_INTERVAL;
 
     // extract milliseconds, seconds, minutes as floats
     let f_milliseconds = score;
@@ -367,7 +379,12 @@ function updateScore() {
     let milliseconds_text = String(milliseconds)[0];
 
     score_text = minutes_text + ":" + seconds_text + "." + milliseconds_text;
+
     document.getElementById("score").textContent = score_text;
+
+    if ((error_image_score != -1) && ((score - error_image_score >= ERROR_IMAGE_TIME) || (!inGame))) {
+        ERROR_IMAGE.classList.add("hide");
+    }
 }
 
 //function to reduce the snake size
@@ -641,4 +658,14 @@ function populate_leaderboard_table() {
             }
         }
     });
+}
+
+// perform some actions if bug_feature changes from false to true
+function processBugFeature() {
+    old_bug_feature = bug_feature;
+    ERROR_IMAGE.classList.remove("hide");
+    // score at the time of displaying the image
+    error_image_score = score;
+    console.log("error image initial score: " + error_image_score);
+    // image hiding is done in updateScore()
 }

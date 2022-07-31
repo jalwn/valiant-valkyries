@@ -47,7 +47,8 @@ FoodType = namedtuple("FoodType", ["name", "min_score", "weight", "food_type", "
 TIME_FOOD = FoodType("time", 45e3, 10, 0, 2000)
 # value -> increase in hp (x)
 HP_X_FOOD = FoodType("hp_x", 20e3, 50, 1, 3)
-FEATURE_FOOD = FoodType("feature", 30e3, 10, 2, 1)
+# FEATURE_FOOD = FoodType("feature", 30e3, 10, 2, 1)
+FEATURE_FOOD = FoodType("feature", 0e3, 100, 2, 1)
 # value -> increase in hp (1)
 HP_1_FOOD = FoodType("hp_1", 0, 100, 3, 1)
 
