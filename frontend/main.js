@@ -267,7 +267,8 @@ function doDrawing() {
         // food[0]: x, food[1]: y
         // food[2]: direction (0,1,2,3)
         if (food[3]  == 0) {
-            draw(bug_easy[food[2]], food[0], food[1]);
+            // aspect ratio 3 : 2 ≈ 2.66 : 2
+            draw(bug_easy[food[2]], food[0], food[1], scale=1.2, aspect=[2.66,2]);
         }
         else if(food[3] == 1) {
             draw(bug_4hp[food[2]], food[0], food[1]);
@@ -283,9 +284,37 @@ function doDrawing() {
     }
 }
 
-//added a draw function to draw the images
-function draw(img, x, y, width = BLOCK_SIZE, height = BLOCK_SIZE) {
-    ctx.drawImage(img, x, y, width, height);
+// draw function to draw the images
+function draw(img, x, y, scale = 1.0, aspect = [1,1], width = BLOCK_SIZE, height = BLOCK_SIZE) {
+    /*
+    img: image element
+    x, y: x and y coordinates to draw at
+        (modified according to `scaled_width` and `scaled_height`)
+    scale: overall scaling factor for image
+        eg: 1.0 (default) leaves image as is
+        eg: 0.5 scales image by 0.5 in both weight and height
+    aspect: aspect ratio to apply on the image
+        eg: 1x1 (default) leaves image as is even if it is not actually 1x1
+        eg: 2x1 scales width by 2 and height by 0.5
+    width: base width to draw image (combined with `aspect` and `scale`)
+        defaults to BLOCK_SIZE
+    height: base height to draw image (combined with `aspect` and `scale`)
+        defaults to BLOCK_SIZE
+    */
+    // reduce `aspect` to a `ratio` (i.e., X:1)
+    const ratio = aspect[0] / aspect[1];
+    // `width` is scaled up by `ratio`, and scaled up by `scale`
+    let scaled_width = width * ratio * scale;
+    // `height` is scaled down by `ratio`, and scaled up by `scale`
+    let scaled_height = height / ratio * scale;
+    // shift `x` and `y` by half the width/height difference so the img is still centered
+    let shifted_x = x - (scaled_width - width) / 2;
+    let shifted_y = y - (scaled_height - height) / 2;
+    // debug info
+    // console.log(`\tratio: ${ratio} & scale: ${scale}`);
+    // console.log(`\tdimensions: ${width}x${height} -> ${scaled_width}x${scaled_height}`);
+    // console.log(`\tx, y: ${x}, ${y} -> ${shifted_x}x${shifted_y}`);
+    ctx.drawImage(img, shifted_x, shifted_y, scaled_width, scaled_height);
 }
 
 //function to update score
