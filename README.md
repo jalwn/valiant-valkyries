@@ -19,10 +19,20 @@ change origin url before pulling bcs I changed the repo name
 
 3. run `poetry install` to install dependencies
 
-4. run `poetry run api` to run backend
+4. run `poetry run game` to run the game
 
-4. run `poetry run python -m http.server 9000` to serve client
+4. visit `http://127.0.0.1:8000/game/` to play
 
 ## Gamplay guide
 
 ## Screenshots
+
+## Credits
+
+### sounds used
+1. https://opengameart.org/content/rpg-the-secret-within-the-woods
+2. https://opengameart.org/content/rpg-sound-pack
+3. https://opengameart.org/content/apple-bite
+4. https://opengameart.org/content/8bit-death-whirl (death sound)
+5. https://freesound.org/people/Slaking_97/sounds/455109/ (background music)
+6. https://opengameart.org/content/atmospheric-interaction-sound-pack (integer overflow from this pack)
