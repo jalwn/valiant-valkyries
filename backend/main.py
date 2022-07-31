@@ -24,6 +24,23 @@ leaderboard: List[Tuple]
 food_list: List[List[int]]
 
 
+FoodType = namedtuple("FoodType", ["name", "min_score", "weight", "food_type", "value"])
+# score = seconds survived * 1000 = milliseconds survived
+# Xe3 means X * 1000, i.e., X is the seconds survived
+# value = quantitative value associated with the food
+# can have different meaning for different foods
+
+# value -> decrease in difficulty
+TIME_FOOD = FoodType("time", 45e3, 10, 0, 2000)
+# value -> increase in hp (x)
+HP_X_FOOD = FoodType("hp_x", 20e3, 50, 1, 3)
+FEATURE_FOOD = FoodType("feature", 30e3, 10, 2, 1)
+# value -> increase in hp (1)
+HP_1_FOOD = FoodType("hp_1", 0, 100, 3, 1)
+
+ALL_FOODS = [TIME_FOOD, HP_X_FOOD, FEATURE_FOOD, HP_1_FOOD]
+
+
 @app.websocket_route("/ws")
 async def websocket_endpoint(websocket: WebSocket) -> None:
     """
@@ -61,20 +78,22 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
             if "food_eaten" in receive_data:
                 food_eaten = foods_list[receive_data["food_eaten"]]
+                # time food
                 if food_eaten[3] == 0:
-                    # reduce gameplay difficulty
-                    difficulty += 2000
+                    difficulty += TIME_FOOD.value
                     await update_difficulty(websocket, difficulty)
+                # hp x food
                 elif food_eaten[3] == 1:
-                    # increase snake size
-                    snake_size += 4
+                    # increase snake size by X
+                    snake_size += HP_X_FOOD.value
+                # feature food
                 elif food_eaten[3] == 2:
                     # add a bug feature
                     trigger_bug = not trigger_bug
                     await send_trigger_bug(websocket, trigger_bug)
+                # hp 1 food
                 else:
-                    # normal food
-                    snake_size += 1
+                    snake_size += HP_1_FOOD.value
                 del foods_list[receive_data["food_eaten"]]
                 foods_list.append(food := create_food(score))
                 await send_single_food(websocket, food)
@@ -143,21 +162,12 @@ def get_food_type(score: int) -> int:
 
     Food type is either 0, 1, 2 or 3.
     """
-    FoodType = namedtuple("FoodType", ["name", "min_score", "weight", "food_type"])
-    # score = seconds survived * 1000 = milliseconds survived
-    # Xe3 means X * 1000, i.e., X is the seconds survived
-    time_food = FoodType("time_food", 45e3, 10, 0)
-    hpX_food = FoodType("hpX_food", 20e3, 50, 1)
-    feature_food = FoodType("feature_food", 30e3, 10, 2)
-    hp1_food = FoodType("hp1_food", 0, 100, 3)
+    food = HP_1_FOOD
 
-    food = hp1_food
-
-    all_foods = [hp1_food, hpX_food, feature_food, time_food]
-    valid_foods = [hp1_food]
+    valid_foods = [HP_1_FOOD]
 
     # add valid foods to the list
-    for food in all_foods:
+    for food in ALL_FOODS:
         if food.min_score <= score:
             valid_foods.append(food)
 
