@@ -27,8 +27,7 @@ const MAX_LENGTH = 100;  //max length of the snake
 const DELAY = 120;
 const CANVAS_HEIGHT = 500;
 const CANVAS_WIDTH = 500;
-const SNAKE_SPEED = 6; // real speed of the snake = block size-snake speed = 20-6 =14
-const FOOD_SPEED = 4;
+const FOOD_SPEED = 6;
 
 var x = new Array(MAX_LENGTH);
 var y = new Array(MAX_LENGTH);
@@ -380,19 +379,15 @@ function move() {
     }
     if (leftDirection) {
         x[0] -= BLOCK_SIZE;
-        updateSpeed(x)
     }
     if (rightDirection) {
         x[0] += BLOCK_SIZE;
-        updateSpeed(x)
     }
     if (upDirection) {
         y[0] -= BLOCK_SIZE;
-        updateSpeed(y)
     }
     if (downDirection) {
         y[0] += BLOCK_SIZE;
-        updateSpeed(y)
     }
     //move the foods
     for (var i = 0; i < food_list.length; i++) {
@@ -407,18 +402,6 @@ function move() {
             food_list[i][1] += FOOD_SPEED;
         }
     }
-}
-
-//update snake speed
-function updateSpeed(list) {
-    for (var z = snake_size; z >= 0; z--) {
-        if (leftDirection || upDirection) {
-            list[z] += SNAKE_SPEED;
-        }
-        if (rightDirection || downDirection) {
-            list[z] -= SNAKE_SPEED;
-        }
-    };
 }
 
 // check if the snake head hits the wall
