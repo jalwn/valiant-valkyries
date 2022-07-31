@@ -19,17 +19,17 @@ app: FastAPI = FastAPI()
 T_leaderboard: TypeAlias = list[tuple[str, int]]
 
 
-class TypedInfo(TypedDict):
+class TypedInfo(TypedDict):  # noqa: D101
     snake_pos: list[int]
     score: int
 
 
-class TypedSave(TypedDict):
+class TypedSave(TypedDict):  # noqa: D101
     user: str
     score: int
 
 
-class TypedData(TypedDict):
+class TypedData(TypedDict):  # noqa: D101
     food_eaten: int
     info: TypedInfo
     Game_Over: bool
