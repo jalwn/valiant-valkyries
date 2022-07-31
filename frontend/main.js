@@ -63,6 +63,10 @@ var sounds = {
     }
 }
 
+sounds.crunch_sfx.audio.volume = 0.1
+sounds.eat_sfx.audio.volume = 0.1
+sounds.death_sfx.audio.volume = 0.2
+
 sounds.eat_sfx.audio.addEventListener("ended", function(){
     sounds.eat_sfx.audio.currentTime = 0;
     sounds.eat_sfx.isplaying = false
