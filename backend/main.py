@@ -2,26 +2,39 @@ import json
 import os
 import random
 from collections import namedtuple
-from typing import List, Tuple
+from typing import TypedDict, TypeAlias, Final
 
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 
-BLOCK_SIZE = 20
-CANVAS_HEIGHT = 500
-CANVAS_WIDTH = 500
-LEADERBOARD_SORT_BY = "score"
-BACKEND = os.path.join(os.getcwd(), "frontend")
-app = FastAPI()
+BLOCK_SIZE: Final[int] = 20
+CANVAS_HEIGHT: Final[int] = 500
+CANVAS_WIDTH: Final[int] = 500
+LEADERBOARD_SORT_BY: Final[str] = "score"
+BACKEND: Final[str] = os.path.join(os.getcwd(), "frontend")
+app: FastAPI = FastAPI()
 
-snake_position: List[int]
-score: int
-snake_size: int
-difficulty: int
-tigger_bug: bool
-leaderboard: List[Tuple]
-food_list: List[List[int]]
+
+T_leaderboard: TypeAlias = list[tuple[str, int]]
+
+
+class TypedInfo(TypedDict):
+    snake_pos: list[int]
+    score: int
+
+
+class TypedSave(TypedDict):
+    user: str
+    score: int
+
+
+class TypedData(TypedDict):
+    food_eaten: int
+    info: TypedInfo
+    Game_Over: bool
+    save: TypedSave
+    snake_size: int
 
 
 @app.websocket_route("/ws")
@@ -33,17 +46,17 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     and it is used to send and recive data to the client.
     """
     await websocket.accept()
-    snake_position = []
-    score = 0
-    snake_size = 3
-    difficulty = 3*1000  # time in milliseconds
-    trigger_bug = False
-    leaderboard = load_leaderboard()
-    foods_list = food_list()
+    snake_position: list[int] = []
+    score: int = 0
+    snake_size: int = 3
+    difficulty: int = 3 * 1000  # time in milliseconds
+    trigger_bug: bool = False
+    leaderboard: list[tuple[str, int]] = load_leaderboard()
+    foods_list: list[list[int]] = food_list()
     await send_food_list(websocket, foods_list)
     try:
         while True:
-            receive_data = await websocket.receive_json()
+            receive_data: TypedData = await websocket.receive_json()
 
             if "info" in receive_data:
                 snake_position = receive_data["info"]["snake_pos"]
@@ -88,7 +101,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 await send_single_food(websocket, food)
 
             if "save" in receive_data:
-                leaderboard = await save_score(websocket, receive_data["save"], leaderboard)
+                leaderboard = await save_score(
+                    websocket, receive_data["save"], leaderboard
+                )
                 print("leaderboard: ", leaderboard)
 
             if "snake_size" in receive_data:
@@ -102,17 +117,17 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
         print("Connection closed by client")
 
 
-async def send_food_list(socket: WebSocket, food_list: List[List[int]]) -> None:
+async def send_food_list(socket: WebSocket, food_list: list[list[int]]) -> None:
     """Send created food list to client."""
     await socket.send_json({"food_list": food_list})
 
 
-async def send_single_food(socket: WebSocket, food: List[int]) -> None:
+async def send_single_food(socket: WebSocket, food: list[int]) -> None:
     """Send single created food data to client."""
     await socket.send_json({"food": food})
 
 
-async def send_leaderboard(socket: WebSocket, leaderboard: List[Tuple]) -> None:
+async def send_leaderboard(socket: WebSocket, leaderboard: list[tuple]) -> None:
     """Send leaderboard data to client."""
     await socket.send_json({"leaderboard": leaderboard})
 
@@ -132,7 +147,7 @@ async def send_alert(socket: WebSocket, alert: str) -> None:
     await socket.send_json({"alert": alert})
 
 
-def create_food(score: int) -> List[int]:
+def create_food(score: int) -> list[int]:
     """
     Create one food item for snake to consume.
 
@@ -175,7 +190,7 @@ def get_food_type(score: int) -> int:
     return food.food_type
 
 
-def food_list() -> List[List[int]]:
+def food_list() -> list[list[int]]:
     """
     Create a list of food items for snake to consume.
 
@@ -188,20 +203,22 @@ def food_list() -> List[List[int]]:
     return food_list
 
 
-async def save_score(websocket: WebSocket, data: dict, list: List) -> List[tuple]:
+async def save_score(
+    websocket: WebSocket, data: TypedSave, lb: T_leaderboard
+) -> T_leaderboard:
     """Save the score for a user into leaderboard.
 
     Leaderboard is sorted by score in descending order.
     """
     # check if the user is already in the leaderboard
-    if data["user"] in [row[0] for row in list]:
+    if data["user"] in [row[0] for row in lb]:
         # if so, update the score of the user
-        for row in list:
+        for row in lb:
             if row[0] == data["user"]:
                 # check if the score is higher than the previous one
                 if data["score"] > row[1]:
                     entry = tuple(data.values())
-                    list.remove(row)
+                    lb.remove(row)
                     alert = "Congrats, you set a new Higher Score!"
                     break
                 # if not, discard the score
@@ -216,35 +233,35 @@ async def save_score(websocket: WebSocket, data: dict, list: List) -> List[tuple
 
     # check if the entry is not None//if the score is lower than the previous one
     if entry is not None:
-        list.append(entry)
+        lb.append(entry)  # type: ignore
         # sort by score in descending order
-        list.sort(key=lambda x: x[1], reverse=True)
-        save_score_to_file(list)
+        lb.sort(key=lambda x: x[1], reverse=True)
+        save_score_to_file(lb)
 
-    await send_leaderboard(websocket, list)
+    await send_leaderboard(websocket, lb)
     await send_alert(websocket, alert)
-    return list
+    return lb
 
 
-def save_score_to_file(data: list) -> None:
+def save_score_to_file(data: T_leaderboard) -> None:
     """Save the leaderboard into leaderboard.json."""
     # convert list of tuples to list of dicts
-    data = [dict(zip(data[0], row)) for row in data]
+    new_data = [dict(zip(data[0], row)) for row in data]
     # create dict to load file values
     file_data = dict()
-    with open('leaderboard.json', 'r+') as f:
+    with open("leaderboard.json", "r+") as f:
         file_data = json.load(f)
         f.seek(0)
         # append new data and delete old data
-        file_data.update({"user_scores": data})
+        file_data.update({"user_scores": new_data})
         f.truncate(0)
         json.dump(file_data, f, indent=4)
         f.close()
 
 
-def load_leaderboard() -> List[Tuple]:
+def load_leaderboard() -> T_leaderboard:
     """Load leaderboard from file."""
-    with open('leaderboard.json', 'r') as f:
+    with open("leaderboard.json", "r") as f:
         leaderboard = json.load(f)
         f.close()
     leaderboard = leaderboard["user_scores"]
