@@ -1,16 +1,9 @@
 {
-    "user_scores": [
-        {
-            "hahaha": "high",
-            "20600": 20600
-        },
-        {
-            "hahaha": "mid",
-            "20600": 14150
-        },
-        {
-            "hahaha": "low",
-            "20600": 2600
-        }
-    ]
+    "user_scores": {
+        "Anirban": 25300,
+        "havokwrecker": 20600,
+        "Topmost": 14800,
+        "xCirno": 10800,
+        "aashish": 8300
+    }
 }

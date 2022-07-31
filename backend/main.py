@@ -80,6 +80,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 score = receive_data["info"]["score"]
                 # decrease difficulty every 2s until it reaches 600ms
                 if difficulty > 600 and score % 2e3 == 0:
+                    # depending on the score
                     if score > 40e3:
                         difficulty -= 400
                     elif score > 20e3 and snake_size > 8:
@@ -245,8 +246,8 @@ async def save_score(
 
 def save_score_to_file(data: T_leaderboard) -> None:
     """Save the leaderboard into leaderboard.json."""
-    # convert list of tuples to list of dicts
-    new_data = [dict(zip(data[0], row)) for row in data]
+    # convert list of tuples to items of a dict
+    new_data = {row[0]: row[1] for row in data}
     # create dict to load file values
     file_data = dict()
     with open("leaderboard.json", "r+") as f:
@@ -265,8 +266,8 @@ def load_leaderboard() -> T_leaderboard:
         leaderboard = json.load(f)
         f.close()
     leaderboard = leaderboard["user_scores"]
-    for i, row in enumerate(leaderboard):
-        leaderboard[i] = tuple(row.values())
+    # convert dict to list of tuples
+    leaderboard = [(key, value) for key, value in leaderboard.items()]
     return leaderboard
 
 
