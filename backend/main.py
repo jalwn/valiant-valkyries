@@ -2,7 +2,7 @@ import json
 import os
 import random
 from collections import namedtuple
-from typing import TypedDict, TypeAlias, Final
+from typing import Final, TypeAlias, TypedDict
 
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
