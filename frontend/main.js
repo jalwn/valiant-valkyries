@@ -305,13 +305,13 @@ function move() {
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i]
         if (food[2] == 0) {
-            food_list[i][0] -= FOOD_SPEED;
-        } else if (food[2] == 1) {
-            food_list[i][0] += FOOD_SPEED;
-        } else if (food[2] == 2) {
             food_list[i][1] -= FOOD_SPEED;
-        } else if (food[2] == 3) {
+        } else if (food[2] == 1) {
             food_list[i][1] += FOOD_SPEED;
+        } else if (food[2] == 2) {
+            food_list[i][0] -= FOOD_SPEED;
+        } else if (food[2] == 3) {
+            food_list[i][0] += FOOD_SPEED;
         }
     }
     if (leftDirection) {
@@ -355,13 +355,13 @@ function checkFoodCollision() {
     for (var i = 0; i < food_list.length; i++) {
         food = food_list[i];
         if (food[0] > CANVAS_WIDTH - BLOCK_SIZE) {
-            food_list[i][2] = 0;
-        } else if (food[0] < 0) {
-            food_list[i][2] = 1;
-        } else if (food[1] > CANVAS_HEIGHT - BLOCK_SIZE) {
             food_list[i][2] = 2;
-        } else if (food[1] < 0) {
+        } else if (food[0] < 0) {
             food_list[i][2] = 3;
+        } else if (food[1] > CANVAS_HEIGHT - BLOCK_SIZE) {
+            food_list[i][2] = 0;
+        } else if (food[1] < 0) {
+            food_list[i][2] = 1;
         }
     }
 }
