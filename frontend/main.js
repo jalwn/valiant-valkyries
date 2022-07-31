@@ -417,13 +417,16 @@ function gameOver() {
     clearInterval(reduceIntervalId);
     send_sever(socket, {'Game_Over': true});
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = 'blue';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.font = "normal bold 22px sans-serif";
-    display_text = 'Game over Score: ' + score ;
-    ctx.fillText(display_text, CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
-    ctx.fillText(deathReason, CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 20);
+    ctx.font = "normal bold 26px sans-serif";
+    display_text = 'Game Over'
+    display_text2 = 'Score: ' + score ;
+    ctx.fillText(display_text, CANVAS_WIDTH/2, CANVAS_HEIGHT/2-30);
+    ctx.fillText(display_text2, CANVAS_WIDTH/2, CANVAS_HEIGHT/2+30-30);
+    ctx.font = "normal 22px sans-serif";
+    ctx.fillText(deathReason, CANVAS_WIDTH/2, CANVAS_HEIGHT/2 + 55-30);
     const play_btn = document.getElementById("play");
     play_btn.style.display = "inline-block";
     play_btn.onclick = function () {
