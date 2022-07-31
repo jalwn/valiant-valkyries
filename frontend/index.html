@@ -37,8 +37,8 @@
                             <li class="list-group-item">The poison of this land causes you to starve.</li>
                             <li class="list-group-item">To stay alive, you must keep feeding.</li>
                             <li class="list-group-item">Use the <kbd>← ↑ ↓ →</kbd> (arrow keys) or <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> keys to move around.</li>
-                            <li class="list-group-item">Stay away from the <span class="poison">poison</span> wall. This will be easy as you can move over your own body.</li>
-                            <li class="list-group-item">Different foods will give you different effects. (not all of them are desirable)</li>
+                            <li class="list-group-item">Stay away from the <span class="poison">poison</span> wall. Nothing survives out there.</li>
+                            <li class="list-group-item">This will be easy as you can move over your own body.</li>
                             <li class="list-group-item">The "yellow bug" <img src="images/yellow-bug/2.png" height="16"> regenerates one segment of your body.</li>
                             <li class="list-group-item">The "red bug" <img src="images/red-bug/2.png" height="16"> regenerates more than one segments of your body.</li>
                             <li class="list-group-item">The "caterpillar" <img src="images/caterpillar/2.png" height="16"> lends immunity from the poison.</li>
@@ -60,17 +60,20 @@
                     </canvas>
                 </div>
                 <div id="score-col" class="col d-flex align-self-center justify-content-center">
-                    <div class="p-3" id="score">00:00.0</div>
-                    <table id="leaderboard" class="hide table table-lg table-hover table-bordered align-middle m-auto">
-                        <thead>
-                            <tr>
-                                <th scope="col">Player</th>
-                                <th scope="col">High Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                    <div class="col">
+                        <div class="p-3" id="score">00:00.0</div><br>
+                        <div class="hide"><img id="error" class="rounded" src="images/integer-overflow.png" height="300px"></div>
+                        <table id="leaderboard" class="hide table table-lg table-hover table-bordered align-middle m-auto">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Player</th>
+                                    <th scope="col">High Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="row justify-content-center">
