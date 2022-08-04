@@ -54,6 +54,8 @@ A modal is displayed on the webpage on game start.
 
 ## Screenshots
 
+![Project thumbnail picture](https://imgur.com/HepmLNH)
+
 ## Credits
 
 ### sounds used
