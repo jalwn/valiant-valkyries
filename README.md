@@ -29,7 +29,7 @@ The player's character (the snake) is an unknown land where the poison causes it
 Moreover, there is a poison wall at the edge of the game screen.
 The player must prevent the death of the snake by keeping away from the edge of the game and eating different foods.
 The rate at which the snake loses health depends directly on the difficulty of the game
- 
+
 Currently, four foods are implemented:
 1. Yellow bug: regenerates 1 health
 2. Red bug: regenerates 3 health
@@ -54,7 +54,7 @@ A modal is displayed on the webpage on game start.
 
 ## Screenshots
 
-![Project thumbnail picture](https://imgur.com/HepmLNH)
+![Imgur](https://i.imgur.com/HepmLNH.png[/img])
 
 ## Credits
 
