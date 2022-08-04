@@ -164,6 +164,7 @@ We've included a porting of `dev-requirements.txt` to both [poetry](./samples/py
 If you use the poetry setup, make sure to change the project name, description, and authors at the top of the file.
 
 When installing new dependencies, don't forget to [pin them](https://pip.pypa.io/en/stable/user_guide/#pinned-version-numbers) by adding a version tag at the end.
+
 For example, if I wish to install `Click`, a quick look at [PyPI](https://pypi.org/project/click/) tells me that 8.0.1 is the latest version.
 I will then add `click ~= 8.0`, without the last number, to my dependency manager.
 
