@@ -39,7 +39,7 @@ Currently, four foods are implemented:
 ## Code description
 The backend code is implemented in `main.py` in `backend/`.
 It defines multiple api methods that return different data like the food to spawn, difficulty of the game.
-It contains algorithms to dynamically change difficulty, and randomly select a food item from a weighted random distributionm
+It contains algorithms to dynamically change difficulty, and randomly select a food item from a weighted random distribution.
 The player can save their score which is written to a local `leaderboard.json` by the backend.
 The webpage is served by the backend itself.
 
